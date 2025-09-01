@@ -1,0 +1,67 @@
+import {useForm, SubmitHandler} from "react-hook-form";
+import React from 'react'
+
+type Inputs = {
+    name: string,
+    price: number,
+    billingCycle: string,
+    category: string[],
+    description: string
+};
+
+
+function Form() {
+    const { register, handleSubmit, formState: { errors } } = useForm<Inputs>();
+    const onSubmit: SubmitHandler<Inputs> = data => console.log(data);
+
+    return (
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div>
+                <label className="block text-sm font-medium text-gray-700">Subscription Name</label>
+                <input
+                    {...register("name", { required: true })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    placeholder="e.g., Netflix"
+                />
+                {errors.name && <span className="text-red-500 text-sm">This field is required</span>}
+            </div>
+
+            <div>
+                <label className="block text-sm font-medium text-gray-700">Price ($)</label>
+                <input
+                    type="number"
+                    step="0.01"
+                    {...register("price", { required: true, min: 0 })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    placeholder="e.g., 9.99"
+                />
+                {errors.price && <span className="text-red-500 text-sm">Please enter a valid price</span>}
+            </div>
+
+            <div>
+                <label className="block text-sm font-medium text-gray-700">Billing Cycle</label>
+                <select
+                    {...register("billingCycle", { required: true })}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                >
+                    <option value="">Select a cycle</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                    <option value="weekly">Weekly</option>
+                </select>
+                {errors.billingCycle && <span className="text-red-500 text-sm">This field is required</span>}
+            </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Category</label>
+                            <select
+                                {...register("category", { required: true })}
+                                multiple
+                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                            ></select>
+                        </div>
+                    </form>
+                );
+}
+
+export default Form
