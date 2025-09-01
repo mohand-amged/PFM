@@ -1,9 +1,7 @@
 import React from 'react'
 import Logo from '../defaults/Logo'
-import { MdAnalytics, MdOutlineSpaceDashboard } from "react-icons/md";
-import { MdOutlineAttachMoney } from "react-icons/md";
+import { MdAnalytics, MdOutlineSpaceDashboard, MdOutlineAttachMoney } from "react-icons/md";
 import NavLink from './NavLink';
-import { Settings } from 'lucide-react';
 
 export const NAV_LINKS = [
     { 
@@ -33,7 +31,6 @@ function SideBar() {
             {NAV_LINKS.map((navLink, i: number) => (
                 <NavLink key={i} navLink={navLink} />
             ))}
-
         </nav>
     </div>
   )

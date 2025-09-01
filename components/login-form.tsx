@@ -24,11 +24,9 @@ export function LoginForm({
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    setError(null);
     try {
       const result = await signIn("credentials", {
         redirect: false,
@@ -37,12 +35,12 @@ export function LoginForm({
       });
 
       if (result?.error) {
-        setError("Invalid email or password");
+        throw new Error("Invalid email or password");
       } else {
         router.push("/");
       }
     } catch (error) {
-      setError("An unexpected error occurred.");
+      throw new Error("An unexpected error occurred.");
     }
   };
 
@@ -115,7 +113,6 @@ export function LoginForm({
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-              {error && <p className="text-red-500 text-sm">{error}</p>}
               <Button type="submit" className="w-full">
                 Login
               </Button>

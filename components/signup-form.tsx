@@ -45,8 +45,8 @@ export function SignupForm({
         const data = await res.json();
         setError(data.error || "Something went wrong");
       }
-    } catch (error: any) {
-      setError(error?.message || "Something went wrong");
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "Something went wrong");
     }
   };
 
