@@ -1,0 +1,52 @@
+import { compare } from 'bcryptjs';
+import { sign, verify } from 'jsonwebtoken';
+import prisma from './db';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const JWT_EXPIRES_IN = '7d';
+
+export interface User {
+  id: string;
+  email: string | null;
+  name: string | null;
+}
+
+export async function login(email: string, password: string): Promise<{ token: string; user: Omit<User, 'password'> } | null> {
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    return null;
+  }
+
+  const isPasswordValid = await compare(password, user.password!);
+  if (!isPasswordValid) {
+    return null;
+  }
+
+  const { password: _, ...userWithoutPassword } = user;
+  const token = sign({ userId: user.id }, JWT_SECRET, {
+    expiresIn: JWT_EXPIRES_IN,
+  });
+
+  return { token, user: userWithoutPassword };
+}
+
+export async function verifyToken(token: string): Promise<User | null> {
+  try {
+    const payload = verify(token, JWT_SECRET) as { userId: string };
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId },
+      select: { id: true, email: true, name: true },
+    });
+    return user;
+  } catch (error) {
+    return null;
+  }
+}
+
+export async function getCurrentUser(token: string | undefined): Promise<User | null> {
+  if (!token) return null;
+  return verifyToken(token);
+}

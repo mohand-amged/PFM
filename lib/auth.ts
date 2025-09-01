@@ -1,17 +1,8 @@
-import NextAuth from "next-auth";
-import { authOptions } from "./auth-options";
+// This file is kept for backward compatibility but now re-exports from auth-service.ts
+// New code should import directly from '@/lib/auth-service' or '@/lib/auth-utils'
 
-declare module "next-auth" {
-  interface Session {
-    user: {
-      id: string;
-    };
-  }
-}
-
-export const { handlers, auth, signIn, signOut } = NextAuth(authOptions);
-
-export async function getCurrentUser() {
-  const session = await auth();
-  return session?.user;
-}
+export * from './auth-utils';
+// Explicitly re-export from auth-service, excluding getCurrentUser which is already in auth-utils
+export { login, verifyToken } from './auth-service';
+// Explicitly re-export types
+export type { User } from './auth-service';
