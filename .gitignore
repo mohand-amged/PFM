@@ -40,4 +40,10 @@ yarn-error.log*
 next-env.d.ts
 node_modules
 
-https://subs-organizer.vercel.app/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.development
+.env.test
+.env.production
