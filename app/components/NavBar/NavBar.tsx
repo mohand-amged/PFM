@@ -7,10 +7,52 @@ import { NAV_LINKS } from "./SideBar";
 import NavLink from "./NavLink";
 import { Button } from "@/components/ui/button";
 import Link from "next/link"
-import { useSession, signOut } from "next-auth/react";
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+type User = {
+  id: string;
+  email: string | null;
+  name: string | null;
+};
 
 function NavBar() {
-  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch current user on component mount
+    const fetchUser = async () => {
+      try {
+        const response = await fetch('/api/auth/me');
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const handleSignOut = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      setUser(null);
+      router.push('/login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <header className="fixed top-0 right-0 left-64 z-10 bg-black backdrop-blur-sm border-b">
@@ -39,27 +81,18 @@ function NavBar() {
         </div>
 
         {/* Login | Sign-up */}
-        <div className="flex items-center gap-2">
-          {status === 'loading' && (
-            <div className="w-24 h-8 bg-gray-700 rounded animate-pulse" />
-          )}
-          {status === 'unauthenticated' && (
+        <div className="flex items-center gap-4">
+          {user ? (
             <>
-              <Button className="bg-white text-black hover:bg-black hover:text-white" asChild>
-                <Link href="/login">Login</Link>
-              </Button>
-              <Button className="bg-black text-white hover:bg-white hover:text-black" asChild>
-                <Link href="/signup">Sign Up</Link>
-              </Button>
-            </>
-          )}
-          {status === 'authenticated' && (
-            <>
-              <span className="text-white">{session.user?.name}</span>
-              <Button className="bg-red-500 text-white hover:bg-red-600" onClick={() => signOut()}>
+              <span className="text-sm">{user.name || user.email}</span>
+              <Button variant="outline" onClick={handleSignOut}>
                 Sign Out
               </Button>
             </>
+          ) : (
+            <Button asChild variant="outline">
+              <Link href="/login">Sign In</Link>
+            </Button>
           )}
         </div>
       </div>
