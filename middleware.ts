@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { verifyToken } from '@/lib/auth-service';
 
-const publicPaths = ['/login', '/register'];
-const authPaths = ['/login', '/register'];
+const publicPaths = ['/login', '/signup'];
+const authPaths = ['/login', '/signup'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

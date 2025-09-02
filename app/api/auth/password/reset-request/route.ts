@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
     await prisma.verificationToken.create({ data: { identifier: email, token, expires } });
 
-    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const resetUrl = `${baseUrl}/api/auth/password/reset?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`;
 
     if (process.env.NODE_ENV !== "production") {
