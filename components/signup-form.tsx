@@ -42,8 +42,12 @@ export function SignupForm({
       if (res.ok) {
         router.push("/login");
       } else {
-        const data = await res.json();
-        setError(data.error || "Something went wrong");
+        try {
+          const data = await res.json();
+          setError(data.error || "Something went wrong");
+        } catch (jsonError) {
+          setError(res.statusText || `HTTP ${res.status} error`);
+        }
       }
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "Something went wrong");

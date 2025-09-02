@@ -27,14 +27,21 @@ export async function getCurrentUser(): Promise<User | null> {
   try {
     const response = await fetchWithAuth('/api/auth/me');
     if (!response.ok) return null;
-    return await response.json();
+    
+    try {
+      return await response.json();
+    } catch (jsonError) {
+      // If response is not JSON, return null
+      console.error('Failed to parse user data:', jsonError);
+      return null;
+    }
   } catch (error) {
     console.error('Failed to fetch current user:', error);
     return null;
   }
 }
 
-export async function login(email: string, password: string): Promise<{ user: User }> {
+export async function login(email: string, password: string): Promise<any> {
   const response = await fetch('/api/auth/login', {
     method: 'POST',
     headers: {
@@ -45,11 +52,22 @@ export async function login(email: string, password: string): Promise<{ user: Us
   });
 
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Login failed');
+    let errorMessage = 'Login failed';
+    try {
+      const error = await response.json();
+      errorMessage = error.message || error.error || errorMessage;
+    } catch (jsonError) {
+      // If response is not JSON (e.g., HTML error page), use status text
+      errorMessage = response.statusText || `HTTP ${response.status} error`;
+    }
+    throw new Error(errorMessage);
   }
 
-  return response.json();
+  try {
+    return response.json();
+  } catch (jsonError) {
+    throw new Error('Invalid response format');
+  }
 }
 
 export async function logout(): Promise<void> {

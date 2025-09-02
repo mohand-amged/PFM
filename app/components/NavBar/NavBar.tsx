@@ -27,8 +27,13 @@ function NavBar() {
       try {
         const response = await fetch('/api/auth/me');
         if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
+          try {
+            const userData = await response.json();
+            setUser(userData);
+          } catch (jsonError) {
+            // If response is not JSON, handle gracefully
+            console.error('Failed to parse user data:', jsonError);
+          }
         }
       } catch (error) {
         console.error('Error fetching user:', error);

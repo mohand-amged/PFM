@@ -40,8 +40,15 @@ export function LoginForm({
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
+        let errorMessage = 'Login failed';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorData.error || errorMessage;
+        } catch (jsonError) {
+          // If response is not JSON (e.g., HTML error page), use status text
+          errorMessage = response.statusText || `HTTP ${response.status} error`;
+        }
+        throw new Error(errorMessage);
       }
 
       // Redirect to dashboard on successful login
