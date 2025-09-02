@@ -14,7 +14,7 @@ Set these in your Vercel project settings:
 ```
 DATABASE_URL=mongodb+srv://username:password@cluster.mongodb.net/subs-tracker?retryWrites=true&w=majority
 JWT_SECRET=your-jwt-secret-here
-NEXT_PUBLIC_APP_URL=https://your-domain.vercel.app
+NEXT_PUBLIC_APP_URL=https://subs-organizer.vercel.app
 ```
 
 ### Deployment Steps

@@ -16,6 +16,18 @@ const nextConfig = {
   images: {
     formats: ['image/webp', 'image/avif'],
   },
+  // Webpack configuration to suppress Edge Runtime warnings
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals = config.externals || [];
+      config.externals.push({
+        'bcryptjs': 'commonjs bcryptjs',
+        'jsonwebtoken': 'commonjs jsonwebtoken',
+        'jws': 'commonjs jws',
+      });
+    }
+    return config;
+  },
   // Security headers
   async headers() {
     return [
