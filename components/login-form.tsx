@@ -45,7 +45,7 @@ export function LoginForm({
       }
 
       // Redirect to dashboard on successful login
-      router.push('/dashboard');
+      router.push('/');
       router.refresh();
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An error occurred during login');

@@ -31,7 +31,10 @@ export async function GET(request: Request) {
 
     return NextResponse.json(user);
   } catch (error) {
-    console.error('Session error:', error);
+    // Log error in development only
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Session error:', error);
+    }
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

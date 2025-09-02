@@ -9,7 +9,10 @@ export async function deleteSubscription(formData: FormData) {
   try {
     await prisma.subscription.delete({ where: { id } })
   } catch (e) {
-    console.error('Failed to delete subscription', id, e)
+    // Log error in development only
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Failed to delete subscription', id, e)
+    }
     throw e // Re-throw to handle in the UI
   }
   revalidatePath('/subscriptions')
@@ -40,7 +43,10 @@ export async function updateSubscription(formData: FormData) {
       },
     })
   } catch (e) {
-    console.error('Failed to update subscription', id, e)
+    // Log error in development only
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Failed to update subscription', id, e)
+    }
     throw e // Re-throw to handle in the UI
   }
 

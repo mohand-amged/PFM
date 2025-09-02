@@ -3,20 +3,38 @@ import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
+interface Subscription {
+  id: string;
+  name: string;
+  price: number;
+  billingDate: Date;
+  categories: string[];
+  description?: string;
+}
+
+interface SubscriptionStats {
+  totalMonthly: number;
+  totalAnnual: number;
+  upcomingRenewals: Subscription[];
+}
+
 export default async function DashboardPage() {
-  let subscriptions: any[] = [];
+  let subscriptions: Subscription[] = [];
   let totalMonthly = 0;
   let totalAnnual = 0;
-  let upcomingRenewals: any[] = [];
+  let upcomingRenewals: Subscription[] = [];
 
   try {
     subscriptions = await getUserSubscriptions();
-    const stats = calculateSubscriptionStats(subscriptions);
+    const stats: SubscriptionStats = calculateSubscriptionStats(subscriptions);
     totalMonthly = stats.totalMonthly;
     totalAnnual = stats.totalAnnual;
     upcomingRenewals = stats.upcomingRenewals;
   } catch (error) {
-    console.error('Failed to load subscriptions:', error);
+    // Log error in development only
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Failed to load subscriptions:', error);
+    }
   }
 
   return (

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // Explicitly set Edge Runtime
-export const runtime = 'edge';
+export const runtime = 'experimental-edge';
 
 // Inline JWT verification function to avoid any import issues
 function verifyTokenEdge(token: string): { userId: string } | null {

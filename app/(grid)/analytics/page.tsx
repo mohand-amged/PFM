@@ -5,15 +5,32 @@ import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
+interface Subscription {
+  id: string;
+  name: string;
+  price: number;
+  billingDate: Date;
+  categories: string[];
+  description?: string;
+}
+
+interface CategoryData {
+  name: string;
+  value: number;
+}
+
 export default async function AnalyticsPage() {
-  let subscriptions: any[] = [];
-  let chartData: any[] = [];
+  let subscriptions: Subscription[] = [];
+  let chartData: CategoryData[] = [];
 
   try {
     subscriptions = await getUserSubscriptions();
     chartData = getSpendingByCategory(subscriptions);
   } catch (error) {
-    console.error('Failed to load subscriptions:', error);
+    // Log error in development only
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Failed to load subscriptions:', error);
+    }
   }
 
   const totalSpending = subscriptions.reduce((sum, sub) => sum + sub.price, 0);

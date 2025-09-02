@@ -17,7 +17,10 @@ export async function GET(request: Request) {
     })
     return NextResponse.json(subscriptions)
   } catch (err) {
-    console.error('GET /api/subscriptions error', err)
+    // Log error in development only
+    if (process.env.NODE_ENV === 'development') {
+      console.error('GET /api/subscriptions error', err)
+    }
     return NextResponse.json({ error: 'Failed to fetch subscriptions' }, { status: 500 })
   }
 }
@@ -57,7 +60,10 @@ export async function POST(req: Request) {
 
     return NextResponse.json(created, { status: 201 })
   } catch (err) {
-    console.error('POST /api/subscriptions error', err)
+    // Log error in development only
+    if (process.env.NODE_ENV === 'development') {
+      console.error('POST /api/subscriptions error', err)
+    }
     return NextResponse.json({ error: 'Failed to create subscription' }, { status: 500 })
   }
 }

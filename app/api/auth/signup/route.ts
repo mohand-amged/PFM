@@ -50,7 +50,10 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('Signup error:', error);
+    // Log error in development only
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Signup error:', error);
+    }
     
     return NextResponse.json(
       { error: 'Internal server error' },
