@@ -52,7 +52,7 @@ export function Search({
           onChange={(e) => setSearchTerm(e.target.value)}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          className="w-full pl-10 pr-8 text-white"
+          className="w-full pl-10 pr-8 text-foreground"
         />
         {searchTerm && (
           <button

@@ -65,3 +65,20 @@ export async function getCurrentUserFromHeaders(headers: Headers): Promise<User 
     name: userName,
   };
 }
+
+// Server-side function to get current user from database using user ID from headers
+export async function getCurrentUserFromDatabase(headers: Headers): Promise<User | null> {
+  const userId = headers.get('x-user-id');
+  
+  if (!userId) return null;
+  
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true, name: true },
+    });
+    return user;
+  } catch (error) {
+    return null;
+  }
+}

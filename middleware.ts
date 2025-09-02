@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { verifyToken } from '@/lib/auth-service';
+import { verifyTokenEdge } from '@/lib/edge-auth';
 
 const publicPaths = ['/login', '/signup'];
 const authPaths = ['/login', '/signup'];
@@ -28,8 +28,8 @@ export async function middleware(request: NextRequest) {
 
     // Verify token for protected API routes
     if (token) {
-      const user = await verifyToken(token);
-      if (!user) {
+      const payload = verifyTokenEdge(token);
+      if (!payload) {
         return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), {
           status: 401,
           headers: {
@@ -38,15 +38,10 @@ export async function middleware(request: NextRequest) {
         });
       }
       
-      // Add user to request headers for API routes to access
+      // Add user ID to request headers for API routes to access
+      // The API routes will need to fetch full user data from the database
       const requestHeaders = new Headers(request.headers);
-      requestHeaders.set('x-user-id', user.id);
-      if (user.email) {
-        requestHeaders.set('x-user-email', user.email);
-      }
-      if (user.name) {
-        requestHeaders.set('x-user-name', user.name);
-      }
+      requestHeaders.set('x-user-id', payload.userId);
 
       return NextResponse.next({
         request: {
@@ -80,18 +75,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // If user is authenticated, add user data to request headers
+  // If user is authenticated, add user ID to request headers
   if (token) {
-    const user = await verifyToken(token);
-    if (user) {
+    const payload = verifyTokenEdge(token);
+    if (payload) {
       const requestHeaders = new Headers(request.headers);
-      requestHeaders.set('x-user-id', user.id);
-      if (user.email) {
-        requestHeaders.set('x-user-email', user.email);
-      }
-      if (user.name) {
-        requestHeaders.set('x-user-name', user.name);
-      }
+      requestHeaders.set('x-user-id', payload.userId);
 
       return NextResponse.next({
         request: {

@@ -21,8 +21,8 @@ const NavLink = ({ navLink }: NavLinkProps) => {
     <Link
       href={navLink.link}
       className={`flex ${
-        isActive ? "text-emerald-500" : "text-gray-50"
-      } hover:text-emerald-500 my-2 duration-200 gap-2 items-center p-2 rounded-md`}
+        isActive ? "text-primary" : "text-foreground"
+      } hover:text-primary my-2 duration-200 gap-2 items-center p-2 rounded-md`}
     >
       {React.cloneElement(icon, { className: "w-5 h-5" })}
       {label}

@@ -5,6 +5,23 @@ module.exports = {
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  safelist: [
+    // Ensure these classes are never purged
+    'text-emerald-500',
+    'text-white',
+    'bg-black',
+    'text-gray-50',
+    'text-gray-700',
+    'border-gray-300',
+    'text-red-500',
+    'bg-white/10',
+    'hover:bg-white/20',
+    'border-white/20',
+    'bg-black/90',
+    'text-muted-foreground',
+    'hover:text-foreground',
+    'hover:bg-muted',
+  ],
   theme: {
     extend: {
       colors: {

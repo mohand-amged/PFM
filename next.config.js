@@ -4,6 +4,10 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', 'react-icons'],
   },
+  // Ensure CSS is properly handled in production
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
   // Performance optimizations
   images: {
     formats: ['image/webp', 'image/avif'],
