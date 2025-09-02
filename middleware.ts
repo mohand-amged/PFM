@@ -41,7 +41,9 @@ export async function middleware(request: NextRequest) {
       // Add user to request headers for API routes to access
       const requestHeaders = new Headers(request.headers);
       requestHeaders.set('x-user-id', user.id);
-      requestHeaders.set('x-user-email', user.email);
+      if (user.email) {
+        requestHeaders.set('x-user-email', user.email);
+      }
       if (user.name) {
         requestHeaders.set('x-user-name', user.name);
       }
@@ -84,7 +86,9 @@ export async function middleware(request: NextRequest) {
     if (user) {
       const requestHeaders = new Headers(request.headers);
       requestHeaders.set('x-user-id', user.id);
-      requestHeaders.set('x-user-email', user.email);
+      if (user.email) {
+        requestHeaders.set('x-user-email', user.email);
+      }
       if (user.name) {
         requestHeaders.set('x-user-name', user.name);
       }
