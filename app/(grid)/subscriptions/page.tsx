@@ -1,6 +1,7 @@
 import React from 'react'
 import prisma from '@/lib/db'
-import { getCurrentUser } from '@/lib/auth'
+import { getCurrentUserFromHeaders } from '@/lib/auth-service'
+import { headers } from 'next/headers'
 import { AddButton } from '@/app/components/defaults/AddButton'
 import { deleteSubscription, updateSubscription } from '@/app/actions/subscription'
 
@@ -8,13 +9,14 @@ export const dynamic = 'force-dynamic'
 
 async function getSubscriptions() {
   try {
-    const user = await getCurrentUser()
+    const headersList = await headers()
+    const user = await getCurrentUserFromHeaders(headersList)
     if (!user) {
       return []
     }
     // Query DB directly to avoid server-side fetch URL issues
     const subs = await prisma.subscription.findMany({
-      where: { user: { id: user.id } },
+      where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
     })
     return subs

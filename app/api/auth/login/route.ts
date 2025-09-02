@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { login } from '@/lib/auth-service';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
   try {

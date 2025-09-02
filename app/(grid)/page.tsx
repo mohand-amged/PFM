@@ -1,9 +1,23 @@
 import { getUserSubscriptions, calculateSubscriptionStats } from '@/lib/subscriptions';
 import Link from 'next/link';
 
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardPage() {
-  const subscriptions = await getUserSubscriptions();
-  const { totalMonthly, totalAnnual, upcomingRenewals } = calculateSubscriptionStats(subscriptions);
+  let subscriptions: any[] = [];
+  let totalMonthly = 0;
+  let totalAnnual = 0;
+  let upcomingRenewals: any[] = [];
+
+  try {
+    subscriptions = await getUserSubscriptions();
+    const stats = calculateSubscriptionStats(subscriptions);
+    totalMonthly = stats.totalMonthly;
+    totalAnnual = stats.totalAnnual;
+    upcomingRenewals = stats.upcomingRenewals;
+  } catch (error) {
+    console.error('Failed to load subscriptions:', error);
+  }
 
   return (
     <div className="max-w-7xl mx-auto">

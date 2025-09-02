@@ -3,9 +3,18 @@ import { getUserSubscriptions, getSpendingByCategory } from '@/lib/subscriptions
 import SpendingChart from '@/app/components/SpendingChart';
 import Link from 'next/link';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AnalyticsPage() {
-  const subscriptions = await getUserSubscriptions();
-  const chartData = getSpendingByCategory(subscriptions);
+  let subscriptions: any[] = [];
+  let chartData: any[] = [];
+
+  try {
+    subscriptions = await getUserSubscriptions();
+    chartData = getSpendingByCategory(subscriptions);
+  } catch (error) {
+    console.error('Failed to load subscriptions:', error);
+  }
 
   const totalSpending = subscriptions.reduce((sum, sub) => sum + sub.price, 0);
   const averageMonthlySpending = totalSpending / (subscriptions.length || 1);
