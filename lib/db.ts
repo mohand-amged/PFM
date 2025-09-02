@@ -13,15 +13,16 @@ const prisma = global.prisma ?? new PrismaClient({
   log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
 });
 
-// Configure connection timeout
+// Configure connection with error handling
+if (process.env.NODE_ENV !== 'production') {
+  global.prisma = prisma;
+}
+
+// Test connection on startup
 prisma.$connect().catch((error) => {
   if (process.env.NODE_ENV === 'development') {
     console.error('Database connection failed:', error);
   }
 });
-
-if (process.env.NODE_ENV !== 'production') {
-  global.prisma = prisma;
-}
 
 export default prisma;
