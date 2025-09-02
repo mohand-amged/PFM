@@ -19,7 +19,7 @@ const nextConfig = {
     formats: ['image/webp', 'image/avif'],
   },
   // Webpack configuration to handle Edge Runtime
-  webpack: (config, { isServer, isEdgeRuntime }) => {
+  webpack: (config, { isServer, isEdgeRuntime, webpack }) => {
     if (isServer) {
       config.externals = config.externals || [];
       config.externals.push({
@@ -29,7 +29,7 @@ const nextConfig = {
       });
     }
     
-    // For Edge Runtime, exclude Node.js modules
+    // For Edge Runtime, aggressively exclude Node.js modules
     if (isEdgeRuntime) {
       config.externals = config.externals || [];
       config.externals.push({
@@ -37,7 +37,45 @@ const nextConfig = {
         'jsonwebtoken': 'commonjs jsonwebtoken',
         'jws': 'commonjs jws',
         '@prisma/client': 'commonjs @prisma/client',
+        'prisma': 'commonjs prisma',
+        'fs': 'commonjs fs',
+        'path': 'commonjs path',
+        'crypto': 'commonjs crypto',
+        'util': 'commonjs util',
+        'stream': 'commonjs stream',
+        'buffer': 'commonjs buffer',
+        'events': 'commonjs events',
+        'os': 'commonjs os',
+        'child_process': 'commonjs child_process',
       });
+      
+      // Also add resolve fallbacks for Edge Runtime
+      config.resolve = config.resolve || {};
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        'bcryptjs': false,
+        'jsonwebtoken': false,
+        'jws': false,
+        '@prisma/client': false,
+        'prisma': false,
+        'fs': false,
+        'path': false,
+        'crypto': false,
+        'util': false,
+        'stream': false,
+        'buffer': false,
+        'events': false,
+        'os': false,
+        'child_process': false,
+      };
+      
+      // Add plugin to ignore Node.js modules in Edge Runtime
+      config.plugins = config.plugins || [];
+      config.plugins.push(
+        new webpack.IgnorePlugin({
+          resourceRegExp: /^(bcryptjs|jsonwebtoken|jws|@prisma\/client|prisma)$/,
+        })
+      );
     }
     
     return config;

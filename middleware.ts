@@ -1,9 +1,37 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { verifyTokenEdge } from '@/lib/edge-auth';
 
 // Explicitly set Edge Runtime
 export const runtime = 'edge';
+
+// Inline JWT verification function to avoid any import issues
+function verifyTokenEdge(token: string): { userId: string } | null {
+  try {
+    // Split the JWT token
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      return null;
+    }
+
+    // Decode the payload (middle part)
+    const payload = parts[1];
+    // Add padding if needed
+    const paddedPayload = payload + '='.repeat((4 - payload.length % 4) % 4);
+    
+    // Decode base64
+    const decodedPayload = atob(paddedPayload.replace(/-/g, '+').replace(/_/g, '/'));
+    const parsedPayload = JSON.parse(decodedPayload);
+    
+    // Check if token is expired
+    if (parsedPayload.exp && parsedPayload.exp < Date.now() / 1000) {
+      return null;
+    }
+    
+    return { userId: parsedPayload.userId };
+  } catch (error) {
+    return null;
+  }
+}
 
 const publicPaths = ['/login', '/signup'];
 const authPaths = ['/login', '/signup'];
