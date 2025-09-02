@@ -42,7 +42,7 @@ export function Search({
         <SearchIcon
           className={cn(
             "absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors",
-            isFocused && "text-foreground"
+            isFocused && "text-white"
           )}
         />
         <Input
@@ -52,13 +52,13 @@ export function Search({
           onChange={(e) => setSearchTerm(e.target.value)}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          className="w-full pl-10 pr-8 text-foreground"
+          className="w-full pl-10 pr-8 text-white"
         />
         {searchTerm && (
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-white hover:bg-muted hover:text-foreground"
             aria-label="Clear search"
           >
             <X className="h-4 w-4" />

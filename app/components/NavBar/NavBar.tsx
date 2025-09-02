@@ -8,7 +8,7 @@ import NavLink from "./NavLink";
 
 function NavBar() {
   return (
-    <header className="fixed top-0 right-0 left-64 z-10 bg-background backdrop-blur-sm border-b border-border">
+    <header className="fixed top-0 right-0 left-64 z-10 bg-black backdrop-blur-sm border-b border-border">
       <div className='flex items-center justify-between px-4 py-2'>
         {/* Menu for mobile */}
         <div className="md:hidden">
@@ -18,7 +18,7 @@ function NavBar() {
                 <Menu className="w-6 h-6 text-foreground" />
               </button>
             </SheetTrigger>
-            <SheetContent side="left" className="bg-background text-foreground w-64">
+            <SheetContent side="left" className="bg-black text-white w-64">
               <div className="flex flex-col h-full">
                 {NAV_LINKS.map((navLink, i: number) => (
                   <NavLink key={i} navLink={navLink} />
