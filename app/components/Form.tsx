@@ -12,7 +12,10 @@ type Inputs = {
 
 function Form() {
     const { register, handleSubmit, formState: { errors } } = useForm<Inputs>();
-    const onSubmit: SubmitHandler<Inputs> = data => console.log(data);
+    const onSubmit: SubmitHandler<Inputs> = data => {
+        // Handle form submission
+        console.log('Form submitted:', data);
+    };
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

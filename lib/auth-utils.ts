@@ -9,17 +9,9 @@ export function getAuthToken(): string | null {
 }
 
 export async function fetchWithAuth(input: RequestInfo, init?: RequestInit): Promise<Response> {
-  const token = getAuthToken();
-  const headers = new Headers(init?.headers);
-  
-  if (token) {
-    headers.set('Authorization', `Bearer ${token}`);
-  }
-
   const response = await fetch(input, {
     ...init,
-    headers,
-    credentials: 'same-origin',
+    credentials: 'same-origin', // This will include cookies automatically
   });
 
   if (response.status === 401) {

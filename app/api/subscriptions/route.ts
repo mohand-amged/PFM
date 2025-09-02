@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/db'
-import { getCurrentUser } from '@/lib/auth'
+import { getCurrentUserFromHeaders } from '@/lib/auth-service'
 
-export async function GET() {
+export const runtime = 'nodejs'
+
+export async function GET(request: Request) {
   try {
-    const user = await getCurrentUser()
+    const user = await getCurrentUserFromHeaders(request.headers)
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -21,7 +23,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const user = await getCurrentUser()
+    const user = await getCurrentUserFromHeaders(req.headers)
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

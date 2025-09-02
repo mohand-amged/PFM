@@ -50,3 +50,18 @@ export async function getCurrentUser(token: string | undefined): Promise<User | 
   if (!token) return null;
   return verifyToken(token);
 }
+
+// Server-side function to get current user from request headers (set by middleware)
+export async function getCurrentUserFromHeaders(headers: Headers): Promise<User | null> {
+  const userId = headers.get('x-user-id');
+  const userEmail = headers.get('x-user-email');
+  const userName = headers.get('x-user-name');
+  
+  if (!userId) return null;
+  
+  return {
+    id: userId,
+    email: userEmail,
+    name: userName,
+  };
+}

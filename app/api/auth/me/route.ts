@@ -1,10 +1,17 @@
 import { NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth-service';
 
+export const runtime = 'nodejs';
+
 export async function GET(request: Request) {
   try {
-    const token = request.headers.get('authorization')?.split(' ')[1];
-    
+    // Get token from cookie (set by login route)
+    const cookieHeader = request.headers.get('cookie');
+    const token = cookieHeader
+      ?.split(';')
+      .find(c => c.trim().startsWith('auth-token='))
+      ?.split('=')[1];
+
     if (!token) {
       return NextResponse.json(
         { error: 'No token provided' },

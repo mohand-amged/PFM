@@ -1,15 +1,17 @@
 import * as React from "react";
 import NavBar from "../components/NavBar/NavBar";
 import SideBar from "../components/NavBar/SideBar";
-import { getCurrentUser } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
+import { getCurrentUserFromHeaders } from '@/lib/auth-service';
 
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = await getCurrentUser();
+  const headersList = await headers();
+  const user = await getCurrentUserFromHeaders(headersList);
   if (!user) {
     redirect('/login');
   }
