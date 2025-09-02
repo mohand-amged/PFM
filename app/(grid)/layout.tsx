@@ -1,7 +1,6 @@
 import * as React from "react";
 import NavBar from "../components/NavBar/NavBar";
 import SideBar from "../components/NavBar/SideBar";
-import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { getCurrentUserFromHeadersServer } from '@/lib/edge-auth';
 
@@ -12,9 +11,7 @@ export default async function RootLayout({
 }) {
   const headersList = await headers();
   const user = await getCurrentUserFromHeadersServer(headersList);
-  if (!user) {
-    redirect('/login');
-  }
+  // Remove authentication requirement - user can be null
 
   return (
     <div className="min-h-screen flex">

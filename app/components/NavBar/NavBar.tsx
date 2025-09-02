@@ -49,7 +49,8 @@ function NavBar() {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
       setUser(null);
-      router.push('/login');
+      // Stay on current page instead of redirecting to login
+      window.location.reload();
     } catch (error) {
       console.error('Error signing out:', error);
     }

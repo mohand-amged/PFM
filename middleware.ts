@@ -40,11 +40,6 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get('auth-token')?.value;
 
-  // Check if the current path is public
-  const isPublicPath = publicPaths.some(path => 
-    pathname === path || pathname.startsWith(`${path}/`)
-  );
-
   // Check if the current path is an auth path (login/register)
   const isAuthPath = authPaths.some(path => 
     pathname === path || pathname.startsWith(`${path}/`)
@@ -52,44 +47,31 @@ export async function middleware(request: NextRequest) {
 
   // For API routes
   if (pathname.startsWith('/api/')) {
-    // Allow public API routes
+    // Allow all API routes (auth is now optional)
     if (pathname.startsWith('/api/auth/')) {
       return NextResponse.next();
     }
 
-    // Verify token for protected API routes
+    // For other API routes, add user info if token exists but don't require it
     if (token) {
       const payload = verifyTokenEdge(token);
-      if (!payload) {
-        return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), {
-          status: 401,
-          headers: {
-            'Content-Type': 'application/json',
+      if (payload) {
+        const requestHeaders = new Headers(request.headers);
+        requestHeaders.set('x-user-id', payload.userId);
+
+        return NextResponse.next({
+          request: {
+            headers: requestHeaders,
           },
         });
       }
-      
-      // Add user ID to request headers for API routes to access
-      // The API routes will need to fetch full user data from the database
-      const requestHeaders = new Headers(request.headers);
-      requestHeaders.set('x-user-id', payload.userId);
-
-      return NextResponse.next({
-        request: {
-          headers: requestHeaders,
-        },
-      });
     }
 
-    return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    // Allow unauthenticated access to API routes
+    return NextResponse.next();
   }
 
-  // For page routes
+  // For page routes - redirect authenticated users away from auth pages
   if (isAuthPath) {
     if (token) {
       // If user is logged in and tries to access auth pages, redirect to home
@@ -99,13 +81,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Redirect to login if not authenticated and not a public path
-  if (!token && !isPublicPath) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('from', pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
+  // Allow all other routes without authentication requirement
   // If user is authenticated, add user ID to request headers
   if (token) {
     const payload = verifyTokenEdge(token);
