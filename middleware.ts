@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { verifyTokenEdge } from '@/lib/edge-auth';
 
+// Explicitly set Edge Runtime
+export const runtime = 'edge';
+
 const publicPaths = ['/login', '/signup'];
 const authPaths = ['/login', '/signup'];
 

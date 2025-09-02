@@ -3,7 +3,7 @@ import NavBar from "../components/NavBar/NavBar";
 import SideBar from "../components/NavBar/SideBar";
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
-import { getCurrentUserFromHeaders } from '@/lib/auth-service';
+import { getCurrentUserFromHeadersServer } from '@/lib/edge-auth';
 
 export default async function RootLayout({
   children,
@@ -11,7 +11,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const headersList = await headers();
-  const user = await getCurrentUserFromHeaders(headersList);
+  const user = await getCurrentUserFromHeadersServer(headersList);
   if (!user) {
     redirect('/login');
   }

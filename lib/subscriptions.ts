@@ -1,4 +1,4 @@
-import { getCurrentUserFromHeaders } from '@/lib/auth-service';
+import { getCurrentUserFromHeadersServer } from '@/lib/edge-auth';
 import prisma from './db';
 import { headers } from 'next/headers';
 
@@ -13,7 +13,7 @@ export interface Subscription {
 
 export async function getUserSubscriptions(): Promise<Subscription[]> {
   const headersList = await headers();
-  const user = await getCurrentUserFromHeaders(headersList);
+  const user = await getCurrentUserFromHeadersServer(headersList);
   if (!user?.id) {
     return [];
   }

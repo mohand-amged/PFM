@@ -51,3 +51,30 @@ export function getCurrentUserFromHeaders(headers: Headers): User | null {
     name: userName,
   };
 }
+
+// Edge-compatible version for server components
+export async function getCurrentUserFromHeadersServer(headers: Headers): Promise<User | null> {
+  const userId = headers.get('x-user-id');
+  
+  if (!userId) return null;
+  
+  // For server components, we can import Prisma dynamically
+  try {
+    const { default: prisma } = await import('./db');
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true, name: true },
+    });
+    return user;
+  } catch (error) {
+    // Fallback to header data if database access fails
+    const userEmail = headers.get('x-user-email');
+    const userName = headers.get('x-user-name');
+    
+    return {
+      id: userId,
+      email: userEmail,
+      name: userName,
+    };
+  }
+}

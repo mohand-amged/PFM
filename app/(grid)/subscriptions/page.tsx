@@ -1,6 +1,6 @@
 import React from 'react'
 import prisma from '@/lib/db'
-import { getCurrentUserFromHeaders } from '@/lib/auth-service'
+import { getCurrentUserFromHeadersServer } from '@/lib/edge-auth'
 import { headers } from 'next/headers'
 import { AddButton } from '@/app/components/defaults/AddButton'
 import { deleteSubscription, updateSubscription } from '@/app/actions/subscription'
@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 async function getSubscriptions() {
   try {
     const headersList = await headers()
-    const user = await getCurrentUserFromHeaders(headersList)
+    const user = await getCurrentUserFromHeadersServer(headersList)
     if (!user) {
       return []
     }

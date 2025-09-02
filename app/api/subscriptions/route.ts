@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/db'
-import { getCurrentUserFromHeaders } from '@/lib/auth-service'
+import { getCurrentUserFromDatabase } from '@/lib/auth-service'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
   
 export async function GET(request: Request) {
   try {
-    const user = await getCurrentUserFromHeaders(request.headers)
+    const user = await getCurrentUserFromDatabase(request.headers)
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
 
 export async function POST(req: Request) {
   try {
-    const user = await getCurrentUserFromHeaders(req.headers)
+    const user = await getCurrentUserFromDatabase(req.headers)
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

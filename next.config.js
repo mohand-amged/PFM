@@ -12,8 +12,8 @@ const nextConfig = {
   images: {
     formats: ['image/webp', 'image/avif'],
   },
-  // Webpack configuration to suppress Edge Runtime warnings
-  webpack: (config, { isServer }) => {
+  // Webpack configuration to handle Edge Runtime
+  webpack: (config, { isServer, isEdgeRuntime }) => {
     if (isServer) {
       config.externals = config.externals || [];
       config.externals.push({
@@ -22,6 +22,18 @@ const nextConfig = {
         'jws': 'commonjs jws',
       });
     }
+    
+    // For Edge Runtime, exclude Node.js modules
+    if (isEdgeRuntime) {
+      config.externals = config.externals || [];
+      config.externals.push({
+        'bcryptjs': 'commonjs bcryptjs',
+        'jsonwebtoken': 'commonjs jsonwebtoken',
+        'jws': 'commonjs jws',
+        '@prisma/client': 'commonjs @prisma/client',
+      });
+    }
+    
     return config;
   },
   // Security headers
