@@ -18,7 +18,7 @@ export async function login(email: string, password: string): Promise<{ token: s
         where: { email },
       }),
       new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Database timeout')), 5000)
+        setTimeout(() => reject(new Error('Database timeout')), 10000)
       )
     ]);
 
@@ -54,7 +54,7 @@ export async function verifyToken(token: string): Promise<User | null> {
         select: { id: true, email: true, name: true },
       }),
       new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Database timeout')), 5000)
+        setTimeout(() => reject(new Error('Database timeout')), 10000)
       )
     ]);
     return user;
@@ -96,7 +96,7 @@ export async function getCurrentUserFromDatabase(headers: Headers): Promise<User
         select: { id: true, email: true, name: true },
       }),
       new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Database timeout')), 5000)
+        setTimeout(() => reject(new Error('Database timeout')), 10000)
       )
     ]);
     return user;

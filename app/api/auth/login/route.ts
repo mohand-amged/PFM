@@ -3,6 +3,7 @@ import { login } from '@/lib/auth-service';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const maxDuration = 30; // Increase timeout to 30 seconds
 
 export async function POST(request: Request) {
   try {

@@ -24,8 +24,8 @@ export async function POST(request: Request) {
       prisma.user.findUnique({
         where: { email },
       }),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Database timeout')), 5000)
+      new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('Database timeout')), 10000)
       )
     ]);
 
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
         },
       }),
       new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Database timeout')), 5000)
+        setTimeout(() => reject(new Error('Database timeout')), 10000)
       )
     ]);
 
