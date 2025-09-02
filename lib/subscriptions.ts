@@ -1,6 +1,4 @@
-import { getCurrentUserFromHeadersServer } from '@/lib/edge-auth';
 import prisma from './db';
-import { headers } from 'next/headers';
 
 export interface Subscription {
   id: string;
@@ -12,14 +10,8 @@ export interface Subscription {
 }
 
 export async function getUserSubscriptions(): Promise<Subscription[]> {
-  const headersList = await headers();
-  const user = await getCurrentUserFromHeadersServer(headersList);
-  if (!user?.id) {
-    return [];
-  }
-  
+  // Since authentication was removed, return all subscriptions
   return prisma.subscription.findMany({
-    where: { userId: user.id },
     orderBy: { billingDate: 'asc' },
   });
 }

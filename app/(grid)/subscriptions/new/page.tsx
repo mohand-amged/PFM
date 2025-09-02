@@ -1,16 +1,10 @@
 import { redirect } from 'next/navigation';
 import prisma from '@/lib/db';
-import { getCurrentUser } from '@/lib/auth';
 
 export default async function NewSubscriptionPage() {
   async function createSubscription(formData: FormData) {
     'use server';
     
-    const user = await getCurrentUser();
-    if (!user) {
-      redirect('/login');
-    }
-
     const name = formData.get('name') as string;
     const price = parseFloat(formData.get('price') as string);
     const billingDate = formData.get('billingDate') as string;
@@ -26,9 +20,8 @@ export default async function NewSubscriptionPage() {
         name,
         price,
         billingDate: new Date(billingDate),
-        categories: { set: categories },
+        categories: categories.filter(cat => cat.length > 0),
         description: description || null,
-        user: { connect: { id: user.id } },
       },
     });
 

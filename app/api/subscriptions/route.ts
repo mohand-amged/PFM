@@ -1,18 +1,13 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/db'
-import { getCurrentUserFromDatabase } from '@/lib/auth-service'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
   
 export async function GET(request: Request) {
   try {
-    const user = await getCurrentUserFromDatabase(request.headers)
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    // Since authentication was removed, return all subscriptions
     const subscriptions = await prisma.subscription.findMany({
-      where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
     })
     return NextResponse.json(subscriptions)
@@ -27,11 +22,6 @@ export async function GET(request: Request) {
 
 export async function POST(req: Request) {
   try {
-    const user = await getCurrentUserFromDatabase(req.headers)
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     const { name, price, billingDate, categories = [], description } = await req.json()
 
     if (!name || typeof name !== 'string') {
@@ -49,7 +39,6 @@ export async function POST(req: Request) {
 
     const created = await prisma.subscription.create({
       data: {
-        userId: user.id,
         name,
         price: Number(price),
         billingDate: date,

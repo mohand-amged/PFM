@@ -1,7 +1,5 @@
 import React from 'react'
 import prisma from '@/lib/db'
-import { getCurrentUserFromHeadersServer } from '@/lib/edge-auth'
-import { headers } from 'next/headers'
 import { AddButton } from '@/app/components/defaults/AddButton'
 import { deleteSubscription, updateSubscription } from '@/app/actions/subscription'
 
@@ -9,14 +7,8 @@ export const dynamic = 'force-dynamic'
 
 async function getSubscriptions() {
   try {
-    const headersList = await headers()
-    const user = await getCurrentUserFromHeadersServer(headersList)
-    if (!user) {
-      return []
-    }
-    // Query DB directly to avoid server-side fetch URL issues
+    // Since authentication was removed, return all subscriptions
     const subs = await prisma.subscription.findMany({
-      where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
     })
     return subs
@@ -43,7 +35,7 @@ export default async function Page() {
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">My Subscriptions</h1>
+        <h1 className="text-2xl font-bold">Subscriptions</h1>
         <AddButton />
       </div>
       
