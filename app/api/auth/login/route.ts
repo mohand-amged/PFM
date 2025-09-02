@@ -45,6 +45,15 @@ export async function POST(request: Request) {
     if (process.env.NODE_ENV === 'development') {
       console.error('Login error:', error);
     }
+    
+    // Handle specific timeout errors
+    if (error instanceof Error && error.message === 'Database timeout') {
+      return NextResponse.json(
+        { error: 'Request timeout. Please try again.' },
+        { status: 504 }
+      );
+    }
+    
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

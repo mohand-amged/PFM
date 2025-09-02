@@ -12,34 +12,51 @@ export interface User {
 }
 
 export async function login(email: string, password: string): Promise<{ token: string; user: Omit<User, 'password'> } | null> {
-  const user = await prisma.user.findUnique({
-    where: { email },
-  });
+  try {
+    const user = await Promise.race([
+      prisma.user.findUnique({
+        where: { email },
+      }),
+      new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('Database timeout')), 10000)
+      )
+    ]);
 
-  if (!user) {
-    return null;
+    if (!user) {
+      return null;
+    }
+
+    const isPasswordValid = await compare(password, user.password!);
+    if (!isPasswordValid) {
+      return null;
+    }
+
+    const { password: _, ...userWithoutPassword } = user;
+    const token = sign({ userId: user.id }, JWT_SECRET, {
+      expiresIn: JWT_EXPIRES_IN,
+    });
+
+    return { token, user: userWithoutPassword };
+  } catch (error) {
+    if (error instanceof Error && error.message === 'Database timeout') {
+      throw new Error('Database timeout');
+    }
+    throw error;
   }
-
-  const isPasswordValid = await compare(password, user.password!);
-  if (!isPasswordValid) {
-    return null;
-  }
-
-  const { password: _, ...userWithoutPassword } = user;
-  const token = sign({ userId: user.id }, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
-  });
-
-  return { token, user: userWithoutPassword };
 }
 
 export async function verifyToken(token: string): Promise<User | null> {
   try {
     const payload = verify(token, JWT_SECRET) as { userId: string };
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId },
-      select: { id: true, email: true, name: true },
-    });
+    const user = await Promise.race([
+      prisma.user.findUnique({
+        where: { id: payload.userId },
+        select: { id: true, email: true, name: true },
+      }),
+      new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('Database timeout')), 10000)
+      )
+    ]);
     return user;
   } catch (error) {
     return null;
@@ -73,10 +90,15 @@ export async function getCurrentUserFromDatabase(headers: Headers): Promise<User
   if (!userId) return null;
   
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { id: true, email: true, name: true },
-    });
+    const user = await Promise.race([
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, email: true, name: true },
+      }),
+      new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('Database timeout')), 10000)
+      )
+    ]);
     return user;
   } catch (error) {
     return null;
