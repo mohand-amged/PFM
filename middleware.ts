@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// Explicitly set Edge Runtime
-export const runtime = 'experimental-edge';
+// Use Node.js runtime for compatibility with bcryptjs and jsonwebtoken
+export const runtime = 'nodejs';
 
 // Inline JWT verification function to avoid any import issues
 function verifyTokenEdge(token: string): { userId: string } | null {
