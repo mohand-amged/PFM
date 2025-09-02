@@ -1,8 +1,17 @@
 {
   "framework": "nextjs",
   "functions": {
-    "app/api/**/*.ts": {
+    "app/api/auth/signup/route.ts": {
       "maxDuration": 30
+    },
+    "app/api/**/*.ts": {
+      "maxDuration": 20
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
+  ]
 }
