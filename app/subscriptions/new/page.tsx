@@ -150,7 +150,7 @@ export default async function NewSubscriptionPage() {
         <ul className="text-blue-800 text-sm space-y-1">
           <li>• Check your bank/credit card statements to find all recurring charges</li>
           <li>• Set billing dates a day early to get reminded in advance</li>
-          <li>• Use specific names (e.g., "Netflix Premium" instead of just "Netflix")</li>
+          <li>• Use specific names (e.g., &quot;Netflix Premium&quot; instead of just &quot;Netflix&quot;)</li>
           <li>• Add notes about features or why you subscribed in the description</li>
         </ul>
       </Card>
