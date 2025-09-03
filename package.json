@@ -41,12 +41,12 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
-    "@types/jsonwebtoken": "^9.0.10",
+    "@types/jsonwebtoken": "^9.0.8",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "eslint": "^8",
-    "eslint-config-next": "14.0.3",
+    "eslint": "^9",
+    "eslint-config-next": "^15.0.0",
     "prisma": "^5.0.0",
     "typescript": "^5"
   },
