@@ -5,15 +5,23 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
+    // Create response
     const response = NextResponse.json(
       { message: 'Logout successful' },
       { status: 200 }
     );
 
-    // Clear cookie directly on response
-    response.cookies.delete('auth-token');
+    // Clear authentication cookie
+    response.cookies.set('auth-token', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 0, // Expire immediately
+      path: '/'
+    });
 
     return response;
+
   } catch (error) {
     console.error('Logout error:', error);
     return NextResponse.json(
