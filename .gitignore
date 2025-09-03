@@ -40,7 +40,6 @@ yarn-error.log*
 next-env.d.ts
 node_modules
 
-.env.example
 .env.local
 .env.development.local
 .env.test.local
