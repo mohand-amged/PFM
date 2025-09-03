@@ -9,9 +9,13 @@ export interface Subscription {
   // Add other subscription fields as needed
 }
 
-export async function getUserSubscriptions(): Promise<Subscription[]> {
-  // Since authentication was removed, return all subscriptions
+export async function getUserSubscriptions(userId?: string): Promise<Subscription[]> {
+  if (!userId) {
+    return [];
+  }
+  
   return prisma.subscription.findMany({
+    where: { userId },
     orderBy: { billingDate: 'asc' },
   });
 }

@@ -1,4 +1,6 @@
 import { getUserSubscriptions, calculateSubscriptionStats } from '@/lib/subscriptions';
+import { getCurrentUser } from '@/lib/auth';
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
@@ -19,13 +21,19 @@ interface SubscriptionStats {
 }
 
 export default async function DashboardPage() {
+  const user = await getCurrentUser();
+  
+  if (!user) {
+    redirect('/login');
+  }
+
   let subscriptions: Subscription[] = [];
   let totalMonthly = 0;
   let totalAnnual = 0;
   let upcomingRenewals: Subscription[] = [];
 
   try {
-    subscriptions = await getUserSubscriptions();
+    subscriptions = await getUserSubscriptions(user.id);
     const stats: SubscriptionStats = calculateSubscriptionStats(subscriptions);
     totalMonthly = stats.totalMonthly;
     totalAnnual = stats.totalAnnual;
@@ -38,8 +46,11 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
+    <div className="max-w-7xl mx-auto p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-gray-600 mt-2">Welcome back, {user.name || user.email}</p>
+      </div>
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
