@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import prisma from '@/lib/db';
-import { verifyPassword, createToken, setAuthCookieResponse } from '@/lib/auth';
+import { verifyPassword, createToken } from '@/lib/auth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -60,7 +60,16 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
 
-    return setAuthCookieResponse(response, token);
+    // Set cookie directly on response
+    response.cookies.set('auth-token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 30 * 24 * 60 * 60, // 30 days
+      path: '/'
+    });
+
+    return response;
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

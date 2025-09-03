@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { clearAuthCookieResponse } from '@/lib/auth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -11,7 +10,10 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
 
-    return clearAuthCookieResponse(response);
+    // Clear cookie directly on response
+    response.cookies.delete('auth-token');
+
+    return response;
   } catch (error) {
     console.error('Logout error:', error);
     return NextResponse.json(
