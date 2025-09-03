@@ -7,7 +7,10 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "test-db": "node scripts/test-db.js",
+    "db-push": "prisma db push",
+    "db-reset": "prisma db push --force-reset"
   },
   "dependencies": {
     "@prisma/client": "^5.0.0",
