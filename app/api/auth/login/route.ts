@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import prisma from '@/lib/db';
-import { verifyPassword, createToken, setAuthCookie } from '@/lib/auth';
+import { verifyPassword, createToken, setAuthCookieResponse } from '@/lib/auth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -13,6 +13,9 @@ const loginSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Check database connection
+    await prisma.$connect();
+    
     const body = await request.json();
     const { email, password } = loginSchema.parse(body);
 
@@ -44,10 +47,8 @@ export async function POST(request: NextRequest) {
       name: user.name || undefined,
     });
 
-    // Set cookie
-    await setAuthCookie(token);
-
-    return NextResponse.json(
+    // Create response and set cookie
+    const response = NextResponse.json(
       {
         message: 'Login successful',
         user: {
@@ -58,11 +59,22 @@ export async function POST(request: NextRequest) {
       },
       { status: 200 }
     );
+
+    return setAuthCookieResponse(response, token);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation failed', details: error.errors },
         { status: 400 }
+      );
+    }
+
+    // Handle database connection errors
+    if (error instanceof Error && error.message.includes('connect')) {
+      console.error('Database connection error:', error);
+      return NextResponse.json(
+        { error: 'Database connection failed. Please try again later.' },
+        { status: 503 }
       );
     }
 

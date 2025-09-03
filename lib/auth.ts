@@ -64,8 +64,26 @@ export async function setAuthCookie(token: string) {
   });
 }
 
+// Set auth cookie with response (for API routes)
+export function setAuthCookieResponse(response: NextResponse, token: string) {
+  response.cookies.set('auth-token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    path: '/'
+  });
+  return response;
+}
+
 // Clear auth cookie
 export async function clearAuthCookie() {
   const cookieStore = await cookies();
   cookieStore.delete('auth-token');
+}
+
+// Clear auth cookie with response (for API routes)
+export function clearAuthCookieResponse(response: NextResponse) {
+  response.cookies.delete('auth-token');
+  return response;
 }
