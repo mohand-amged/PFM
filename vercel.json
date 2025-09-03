@@ -1,17 +1,17 @@
 {
   "framework": "nextjs",
   "functions": {
-    "app/api/auth/signup/route.ts": {
+    "app/api/auth/login/route.ts": {
+      "runtime": "nodejs18.x",
       "maxDuration": 30
     },
-    "app/api/**/*.ts": {
+    "app/api/auth/signup/route.ts": {
+      "runtime": "nodejs18.x",
+      "maxDuration": 30
+    },
+    "app/api/auth/logout/route.ts": {
+      "runtime": "nodejs18.x",
       "maxDuration": 20
     }
-  },
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/"
-    }
-  ]
+  }
 }

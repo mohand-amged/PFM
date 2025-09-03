@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
+    "vercel-build": "prisma generate && next build",
     "test-db": "node scripts/test-db.js",
+    "test-api": "node scripts/test-api.js",
     "db-push": "prisma db push",
     "db-reset": "prisma db push --force-reset"
   },

@@ -3,6 +3,9 @@ import { z } from 'zod';
 import prisma from '@/lib/db';
 import { hashPassword, createToken, setAuthCookie } from '@/lib/auth';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 const signupSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
