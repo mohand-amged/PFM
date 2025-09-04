@@ -18,6 +18,8 @@ model User {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   subscriptions Subscription[]
+  expenses      Expense[]
+  savings       Saving[]
 
   @@map("users")
 }
@@ -34,4 +36,39 @@ model Subscription {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("subscriptions")
+}
+
+model Expense {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  amount      Float
+  currency    String   @default("USD")
+  date        DateTime
+  category    String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("expenses")
+}
+
+model Saving {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  amount      Float
+  currency    String   @default("USD")
+  date        DateTime
+  targetAmount Float?
+  category    String?
+  description String?
+  isActive    Boolean  @default(true)
+  isCompleted Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("savings")
 }

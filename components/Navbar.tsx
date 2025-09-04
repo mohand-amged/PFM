@@ -10,6 +10,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 interface User {
   id: string;
@@ -52,7 +53,9 @@ export default function Navbar({ user }: NavbarProps) {
 
   const navLinks = [
     { href: '/dashboard', label: 'Dashboard' },
+    { href: '/expenses', label: 'Expenses' },
     { href: '/subscriptions', label: 'Subscriptions' },
+    { href: '/savings', label: 'Savings' },
     { href: '/analytics', label: 'Analytics' },
   ];
 
@@ -60,10 +63,10 @@ export default function Navbar({ user }: NavbarProps) {
     <div className="relative">
       <button
         onClick={() => setShowProfileMenu(!showProfileMenu)}
-        className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+        className="flex items-center space-x-2 p-2 rounded-lg hover:bg-muted transition-colors"
       >
-        <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-          <User className="w-5 h-5 text-white" />
+        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+          <User className="w-5 h-5 text-primary-foreground" />
         </div>
         <span className="text-sm font-medium hidden md:block">
           {user?.name || user?.email}
@@ -78,17 +81,17 @@ export default function Navbar({ user }: NavbarProps) {
             onClick={() => setShowProfileMenu(false)}
           />
           {/* Menu */}
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-20">
+          <div className="absolute right-0 mt-2 w-48 bg-popover rounded-md shadow-lg ring-1 ring-border z-20">
             <div className="py-1">
-              <div className="px-4 py-2 border-b border-gray-100">
-                <p className="text-sm font-medium text-gray-900">
+              <div className="px-4 py-2 border-b border-border">
+                <p className="text-sm font-medium text-popover-foreground">
                   {user?.name || 'User'}
                 </p>
-                <p className="text-xs text-gray-500">{user?.email}</p>
+                <p className="text-xs text-muted-foreground">{user?.email}</p>
               </div>
               <Link
                 href="/profile"
-                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                className="flex items-center px-4 py-2 text-sm text-popover-foreground hover:bg-muted"
                 onClick={() => setShowProfileMenu(false)}
               >
                 <User className="w-4 h-4 mr-2" />
@@ -96,7 +99,7 @@ export default function Navbar({ user }: NavbarProps) {
               </Link>
               <Link
                 href="/settings"
-                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                className="flex items-center px-4 py-2 text-sm text-popover-foreground hover:bg-muted"
                 onClick={() => setShowProfileMenu(false)}
               >
                 <Settings className="w-4 h-4 mr-2" />
@@ -104,7 +107,7 @@ export default function Navbar({ user }: NavbarProps) {
               </Link>
               <button
                 onClick={handleLogout}
-                className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                className="flex items-center w-full px-4 py-2 text-sm text-destructive hover:bg-muted"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
@@ -131,8 +134,8 @@ export default function Navbar({ user }: NavbarProps) {
               href={link.href}
               className={`text-lg font-medium px-4 py-2 rounded-lg transition-colors ${
                 pathname === link.href
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-700 hover:bg-gray-100'
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-muted'
               }`}
             >
               {link.label}
@@ -141,23 +144,32 @@ export default function Navbar({ user }: NavbarProps) {
           
           <hr className="my-4" />
           
+          <div className="px-4 py-2">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-foreground">Theme</span>
+            </div>
+            <ThemeToggle />
+          </div>
+          
+          <hr className="my-4" />
+          
           <Link
             href="/profile"
-            className="flex items-center text-gray-700 hover:bg-gray-100 px-4 py-2 rounded-lg"
+            className="flex items-center text-muted-foreground hover:bg-muted px-4 py-2 rounded-lg"
           >
             <User className="w-5 h-5 mr-3" />
             Profile
           </Link>
           <Link
             href="/settings"
-            className="flex items-center text-gray-700 hover:bg-gray-100 px-4 py-2 rounded-lg"
+            className="flex items-center text-muted-foreground hover:bg-muted px-4 py-2 rounded-lg"
           >
             <Settings className="w-5 h-5 mr-3" />
             Settings
           </Link>
           <button
             onClick={handleLogout}
-            className="flex items-center text-red-600 hover:bg-gray-100 px-4 py-2 rounded-lg text-left"
+            className="flex items-center text-destructive hover:bg-muted px-4 py-2 rounded-lg text-left"
           >
             <LogOut className="w-5 h-5 mr-3" />
             Logout
@@ -172,13 +184,13 @@ export default function Navbar({ user }: NavbarProps) {
   }
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200">
+    <nav className="bg-background shadow-sm border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link href="/dashboard" className="text-xl font-bold text-gray-900">
-              SubsTracker
+            <Link href="/dashboard" className="text-xl font-bold text-foreground">
+              PFW
             </Link>
           </div>
 
@@ -190,8 +202,8 @@ export default function Navbar({ user }: NavbarProps) {
                 href={link.href}
                 className={`text-sm font-medium transition-colors ${
                   pathname === link.href
-                    ? 'text-blue-600 border-b-2 border-blue-600 pb-1'
-                    : 'text-gray-700 hover:text-blue-600'
+                    ? 'text-primary border-b-2 border-primary pb-1'
+                    : 'text-muted-foreground hover:text-primary'
                 }`}
               >
                 {link.label}
@@ -201,6 +213,9 @@ export default function Navbar({ user }: NavbarProps) {
 
           {/* User Profile / Mobile Menu */}
           <div className="flex items-center space-x-4">
+            <div className="hidden md:block">
+              <ThemeToggle />
+            </div>
             <div className="hidden md:block">
               <ProfileMenu />
             </div>
