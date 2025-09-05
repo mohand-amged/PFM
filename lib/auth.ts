@@ -1,6 +1,7 @@
 import { SignJWT, jwtVerify } from 'jose';
 import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'fallback-secret');
 

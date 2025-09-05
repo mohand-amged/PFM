@@ -1,10 +1,6 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
-import AddExpenseForm from './AddExpenseForm';
-import AddSavingsForm from './AddSavingsForm';
-import { useFinance } from '@/contexts/FinanceContext';
 
 interface User {
   id: string;
@@ -27,64 +23,16 @@ export default function DashboardClient({
   subscriptions, 
   subscriptionStats 
 }: DashboardClientProps) {
-  const [showExpenseForm, setShowExpenseForm] = useState(false);
-  const [showSavingsForm, setShowSavingsForm] = useState(false);
+  // Removed modal forms - using page navigation instead
+  // Using simplified data - in a real app, this would come from server data
+  const expenses: any[] = [];
+  const savingsGoals: any[] = [];
+  const recentExpenses: any[] = [];
+  const savingsProgress = { totalCurrent: 0, totalTarget: 0 };
   
-  const { 
-    expenses,
-    savingsGoals,
-    addExpense,
-    addSavingsGoal,
-    getTotalExpenses,
-    getTotalSavings,
-    getRecentExpenses,
-    getSavingsProgress
-  } = useFinance();
-
-  const totalExpensesThisMonth = getTotalExpenses();
-  const totalSavings = getTotalSavings();
-  const recentExpenses = getRecentExpenses(3);
-  const savingsProgress = getSavingsProgress();
-  
-  // Calculate monthly expenses (simplified for demo - in a real app you'd want proper date filtering)
-  const monthlyExpenses = expenses
-    .filter(expense => {
-      const expenseDate = new Date(expense.date);
-      const now = new Date();
-      return expenseDate.getMonth() === now.getMonth() && 
-             expenseDate.getFullYear() === now.getFullYear();
-    })
-    .reduce((total, expense) => total + expense.amount, 0);
-
-  const weeklyExpenses = expenses
-    .filter(expense => {
-      const expenseDate = new Date(expense.date);
-      const now = new Date();
-      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      return expenseDate >= weekAgo;
-    })
-    .reduce((total, expense) => total + expense.amount, 0);
-
-  const handleExpenseSubmit = (expenseData: any) => {
-    addExpense({
-      amount: parseFloat(expenseData.amount),
-      category: expenseData.category,
-      description: expenseData.description,
-      date: expenseData.date,
-      paymentMethod: expenseData.paymentMethod,
-    });
-  };
-
-  const handleSavingsSubmit = (savingsData: any) => {
-    addSavingsGoal({
-      goalName: savingsData.goalName,
-      targetAmount: parseFloat(savingsData.targetAmount),
-      currentAmount: parseFloat(savingsData.currentAmount),
-      description: savingsData.description,
-      targetDate: savingsData.targetDate,
-      category: savingsData.category,
-    });
-  };
+  // Simplified demo data - in a real app, this would come from server
+  const monthlyExpenses = 0;
+  const weeklyExpenses = 0;
 
   return (
     <div className="max-w-7xl mx-auto p-6">
@@ -292,20 +240,20 @@ export default function DashboardClient({
           <h3 className="text-lg font-bold mb-2">Add Subscription</h3>
           <p className="opacity-90 text-sm">Track a new service</p>
         </Link>
-        <button 
-          onClick={() => setShowExpenseForm(true)}
-          className="bg-red-600 text-white p-6 rounded-lg shadow hover:bg-red-700 transition-colors text-left"
+        <Link 
+          href="/expenses" 
+          className="bg-red-600 text-white p-6 rounded-lg shadow hover:bg-red-700 transition-colors block"
         >
           <h3 className="text-lg font-bold mb-2">Add Expense</h3>
           <p className="opacity-90 text-sm">Record a new expense</p>
-        </button>
-        <button 
-          onClick={() => setShowSavingsForm(true)}
-          className="bg-green-600 text-white p-6 rounded-lg shadow hover:bg-green-700 transition-colors text-left"
+        </Link>
+        <Link 
+          href="/savings" 
+          className="bg-green-600 text-white p-6 rounded-lg shadow hover:bg-green-700 transition-colors block"
         >
           <h3 className="text-lg font-bold mb-2">Add Savings Goal</h3>
           <p className="opacity-90 text-sm">Create a saving target</p>
-        </button>
+        </Link>
         <Link 
           href="/analytics" 
           className="bg-purple-600 text-white p-6 rounded-lg shadow hover:bg-purple-700 transition-colors block"
@@ -315,17 +263,7 @@ export default function DashboardClient({
         </Link>
       </div>
 
-      {/* Forms */}
-      <AddExpenseForm
-        isOpen={showExpenseForm}
-        onClose={() => setShowExpenseForm(false)}
-        onSubmit={handleExpenseSubmit}
-      />
-      <AddSavingsForm
-        isOpen={showSavingsForm}
-        onClose={() => setShowSavingsForm(false)}
-        onSubmit={handleSavingsSubmit}
-      />
+      {/* Modal forms removed - using page navigation instead */}
     </div>
   );
 }
