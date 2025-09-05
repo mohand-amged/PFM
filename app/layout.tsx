@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { getCurrentUser } from "@/lib/auth";
 import { ThemeProvider } from "@/components/theme-provider";
+import { FinanceProvider } from "@/contexts/FinanceContext";
 
 const interSans = Inter({
   variable: "--font-geist-sans",
@@ -33,10 +34,12 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar user={user} />
-          <main className="min-h-screen bg-background">
-            {children}
-          </main>
+          <FinanceProvider>
+            <Navbar user={user} />
+            <main className="min-h-screen bg-background">
+              {children}
+            </main>
+          </FinanceProvider>
         </ThemeProvider>
       </body>
     </html>
