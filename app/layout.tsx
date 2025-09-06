@@ -37,7 +37,9 @@ export default async function RootLayout({
           <FinanceProvider>
             <Navbar user={user} />
             <main className="min-h-screen bg-background">
-              {children}
+              <div className="px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
+                {children}
+              </div>
             </main>
           </FinanceProvider>
         </ThemeProvider>

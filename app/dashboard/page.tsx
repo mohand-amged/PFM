@@ -1,4 +1,5 @@
 import { getUserSubscriptions, calculateSubscriptionStats } from '@/lib/subscriptions';
+import { getWalletStats } from '@/app/actions/wallet';
 import { getCurrentUser } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import DashboardClient from '@/components/DashboardClient';
@@ -19,15 +20,36 @@ export default async function DashboardPage() {
     totalAnnual: 0,
     upcomingRenewals: [],
   };
+  let walletStats = {
+    wallet: { balance: 0, monthlyBudget: 0, currency: 'USD' },
+    monthlyIncome: 0,
+    monthlyExpenses: 0,
+    totalIncome: 0,
+    totalExpenses: 0,
+    netWorth: 0,
+    budgetRemaining: 0,
+    incomeCount: 0,
+  };
 
   try {
-    // Load subscription data
-    subscriptions = await getUserSubscriptions(user.id);
-    subscriptionStats = calculateSubscriptionStats(subscriptions);
+    // Load subscription and wallet data in parallel
+    const [subscriptionsResult, walletResult] = await Promise.allSettled([
+      getUserSubscriptions(user.id),
+      getWalletStats(),
+    ]);
+    
+    if (subscriptionsResult.status === 'fulfilled') {
+      subscriptions = subscriptionsResult.value;
+      subscriptionStats = calculateSubscriptionStats(subscriptions);
+    }
+    
+    if (walletResult.status === 'fulfilled') {
+      walletStats = walletResult.value;
+    }
   } catch (error) {
     // Log error in development only
     if (process.env.NODE_ENV === 'development') {
-      console.error('Failed to load subscription data:', error);
+      console.error('Failed to load dashboard data:', error);
     }
   }
 
@@ -36,6 +58,7 @@ export default async function DashboardPage() {
       user={user}
       subscriptions={subscriptions}
       subscriptionStats={subscriptionStats}
+      walletStats={walletStats}
     />
   );
 }

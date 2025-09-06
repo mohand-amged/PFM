@@ -20,6 +20,9 @@ model User {
   subscriptions Subscription[]
   expenses      Expense[]
   savings       Saving[]
+  wallet        Wallet?
+  notifications Notification[]
+  incomes       Income[]
 
   @@map("users")
 }
@@ -71,4 +74,68 @@ model Saving {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("savings")
+}
+
+model Wallet {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  balance         Float    @default(0)
+  currency        String   @default("USD")
+  monthlyBudget   Float?   @default(0)
+  lastSalaryDate  DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  userId          String   @unique @db.ObjectId
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("wallets")
+}
+
+model Income {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  amount      Float
+  source      String      // salary, freelance, bonus, etc.
+  description String?
+  type        IncomeType  @default(SALARY)
+  date        DateTime
+  currency    String      @default("USD")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  userId      String      @db.ObjectId
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("incomes")
+}
+
+model Notification {
+  id        String           @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  message   String
+  type      NotificationType @default(INFO)
+  isRead    Boolean          @default(false)
+  data      Json?            // Additional data like subscription ID, amount, etc.
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  userId    String           @db.ObjectId
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+enum IncomeType {
+  SALARY
+  FREELANCE
+  BONUS
+  INVESTMENT
+  SIDE_HUSTLE
+  OTHER
+}
+
+enum NotificationType {
+  INFO
+  WARNING
+  SUCCESS
+  SUBSCRIPTION_RENEWAL
+  LOW_BALANCE
+  GOAL_ACHIEVED
+  BUDGET_EXCEEDED
 }

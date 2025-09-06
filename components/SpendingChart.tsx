@@ -18,20 +18,32 @@ const SpendingChart: React.FC<SpendingChartProps> = ({ data }) => {
   }
 
   return (
-    <div className="w-full h-96">
+    <div className="w-full h-64 sm:h-80 lg:h-96">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={data}
           margin={{
-            top: 20,
-            right: 30,
-            left: 20,
-            bottom: 5,
+            top: 10,
+            right: 10,
+            left: 10,
+            bottom: 20,
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
+          <XAxis 
+            dataKey="name" 
+            tick={{ fontSize: 12 }}
+            angle={-45}
+            textAnchor="end"
+            height={60}
+          />
+          <YAxis 
+            tick={{ fontSize: 11 }}
+            tickFormatter={(value) => {
+              if (value >= 1000) return `$${(value/1000).toFixed(0)}k`;
+              return `$${value}`;
+            }}
+          />
           <Tooltip 
             formatter={(value: number) => [`$${value.toFixed(2)}`]} 
             labelFormatter={(name) => `Category: ${name}`}

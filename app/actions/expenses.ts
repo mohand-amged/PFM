@@ -14,7 +14,49 @@ export interface ExpenseData {
   description?: string;
 }
 
-export async function createExpense(data: ExpenseData) {
+export async function createExpense(formData: FormData) {
+  const user = await getCurrentUser();
+  
+  if (!user) {
+    redirect('/login');
+  }
+
+  const name = String(formData.get('name') || '').trim();
+  const amountRaw = String(formData.get('amount') || '');
+  const dateRaw = String(formData.get('date') || '').trim();
+  const category = String(formData.get('category') || '').trim();
+  const currency = String(formData.get('currency') || 'USD');
+
+  if (!name) throw new Error('Expense name is required');
+
+  const amount = parseFloat(amountRaw) || 0;
+  const date = dateRaw ? new Date(dateRaw) : new Date();
+
+  try {
+    await db.expense.create({
+      data: {
+        name,
+        amount,
+        currency,
+        date,
+        category: category || null,
+        userId: user.id,
+      },
+    });
+
+    revalidatePath('/expenses');
+    revalidatePath('/dashboard');
+    revalidatePath('/analytics');
+    
+  } catch (error) {
+    console.error('Error creating expense:', error);
+    throw error;
+  }
+
+  redirect('/expenses');
+}
+
+export async function createExpenseData(data: ExpenseData) {
   const user = await getCurrentUser();
   
   if (!user) {
@@ -109,7 +151,35 @@ export async function updateExpense(id: string, data: Partial<ExpenseData>) {
   }
 }
 
-export async function deleteExpense(id: string) {
+export async function deleteExpense(formData: FormData) {
+  const user = await getCurrentUser();
+  
+  if (!user) {
+    redirect('/login');
+  }
+
+  const id = String(formData.get('id') || '');
+  if (!id) return;
+
+  try {
+    await db.expense.delete({
+      where: { 
+        id,
+        userId: user.id 
+      },
+    });
+
+    revalidatePath('/expenses');
+    revalidatePath('/dashboard');
+    revalidatePath('/analytics');
+    
+  } catch (error) {
+    console.error('Error deleting expense:', error);
+    throw error;
+  }
+}
+
+export async function deleteExpenseById(id: string) {
   const user = await getCurrentUser();
   
   if (!user) {

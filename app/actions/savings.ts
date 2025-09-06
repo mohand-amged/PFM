@@ -16,7 +16,52 @@ export interface SavingData {
   isActive?: boolean;
 }
 
-export async function createSaving(data: SavingData) {
+export async function createSaving(formData: FormData) {
+  const user = await getCurrentUser();
+  
+  if (!user) {
+    redirect('/login');
+  }
+
+  const name = String(formData.get('name') || '').trim();
+  const targetAmountRaw = String(formData.get('targetAmount') || '');
+  const targetDateRaw = String(formData.get('targetDate') || '').trim();
+  const description = String(formData.get('description') || '').trim();
+  const currency = String(formData.get('currency') || 'USD');
+
+  if (!name) throw new Error('Saving goal name is required');
+
+  const targetAmount = parseFloat(targetAmountRaw) || 0;
+  const date = targetDateRaw ? new Date(targetDateRaw) : new Date();
+  const amount = 0; // Starting amount is 0
+
+  try {
+    await db.saving.create({
+      data: {
+        name,
+        amount,
+        currency,
+        date,
+        targetAmount,
+        description: description || null,
+        isActive: true,
+        userId: user.id,
+      },
+    });
+
+    revalidatePath('/savings');
+    revalidatePath('/dashboard');
+    revalidatePath('/analytics');
+    
+  } catch (error) {
+    console.error('Error creating saving:', error);
+    throw error;
+  }
+
+  redirect('/savings');
+}
+
+export async function createSavingData(data: SavingData) {
   const user = await getCurrentUser();
   
   if (!user) {
@@ -111,7 +156,35 @@ export async function updateSaving(id: string, data: Partial<SavingData>) {
   }
 }
 
-export async function deleteSaving(id: string) {
+export async function deleteSaving(formData: FormData) {
+  const user = await getCurrentUser();
+  
+  if (!user) {
+    redirect('/login');
+  }
+
+  const id = String(formData.get('id') || '');
+  if (!id) return;
+
+  try {
+    await db.saving.delete({
+      where: { 
+        id,
+        userId: user.id 
+      },
+    });
+
+    revalidatePath('/savings');
+    revalidatePath('/dashboard');
+    revalidatePath('/analytics');
+    
+  } catch (error) {
+    console.error('Error deleting saving:', error);
+    throw error;
+  }
+}
+
+export async function deleteSavingById(id: string) {
   const user = await getCurrentUser();
   
   if (!user) {
@@ -137,12 +210,15 @@ export async function deleteSaving(id: string) {
   }
 }
 
-export async function toggleSavingStatus(id: string) {
+export async function toggleSavingStatus(formData: FormData) {
   const user = await getCurrentUser();
   
   if (!user) {
     redirect('/login');
   }
+
+  const id = String(formData.get('id') || '');
+  if (!id) return;
 
   try {
     const saving = await db.saving.findFirst({
@@ -153,10 +229,10 @@ export async function toggleSavingStatus(id: string) {
     });
 
     if (!saving) {
-      return { success: false, error: 'Saving not found' };
+      throw new Error('Saving not found');
     }
 
-    const updatedSaving = await db.saving.update({
+    await db.saving.update({
       where: { 
         id,
         userId: user.id 
@@ -170,10 +246,9 @@ export async function toggleSavingStatus(id: string) {
     revalidatePath('/dashboard');
     revalidatePath('/analytics');
     
-    return { success: true, saving: updatedSaving };
   } catch (error) {
     console.error('Error toggling saving status:', error);
-    return { success: false, error: 'Failed to toggle saving status' };
+    throw error;
   }
 }
 

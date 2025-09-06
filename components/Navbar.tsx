@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { User, Settings, LogOut, Menu, X } from 'lucide-react';
+import { User, Settings, LogOut, Menu, X, Wallet, Bell, TrendingUp, CreditCard, PiggyBank, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -52,11 +52,12 @@ export default function Navbar({ user }: NavbarProps) {
   };
 
   const navLinks = [
-    { href: '/dashboard', label: 'Dashboard' },
-    { href: '/expenses', label: 'Expenses' },
-    { href: '/subscriptions', label: 'Subscriptions' },
-    { href: '/savings', label: 'Savings' },
-    { href: '/analytics', label: 'Analytics' },
+    { href: '/dashboard', label: 'Dashboard', icon: TrendingUp },
+    { href: '/wallet', label: 'Wallet', icon: Wallet },
+    { href: '/expenses', label: 'Expenses', icon: CreditCard },
+    { href: '/subscriptions', label: 'Subscriptions', icon: Bell },
+    { href: '/savings', label: 'Savings', icon: PiggyBank },
+    { href: '/analytics', label: 'Analytics', icon: BarChart3 },
   ];
 
   const ProfileMenu = () => (
@@ -122,58 +123,86 @@ export default function Navbar({ user }: NavbarProps) {
   const MobileNavigation = () => (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="sm" className="md:hidden">
-          <Menu className="h-5 w-5" />
+        <Button variant="ghost" size="sm" className="md:hidden p-2 hover:bg-primary/10">
+          <Menu className="h-6 w-6" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-[300px]">
-        <div className="flex flex-col space-y-4 mt-8">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`text-lg font-medium px-4 py-2 rounded-lg transition-colors ${
-                pathname === link.href
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:bg-muted'
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
-          
-          <hr className="my-4" />
-          
-          <div className="px-4 py-2">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-foreground">Theme</span>
+      <SheetContent side="right" className="w-[320px] px-0">
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <div className="px-6 py-4 border-b border-border">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+                <User className="w-5 h-5 text-primary-foreground" />
+              </div>
+              <div>
+                <p className="font-semibold text-foreground text-base">
+                  {user?.name || 'User'}
+                </p>
+                <p className="text-sm text-muted-foreground">{user?.email}</p>
+              </div>
             </div>
-            <ThemeToggle />
+          </div>
+
+          {/* Navigation Links */}
+          <div className="flex-1 px-4 py-6">
+            <div className="space-y-2">
+              {navLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`flex items-center px-4 py-3 rounded-xl transition-all duration-200 ${
+                      pathname === link.href
+                        ? 'bg-primary/10 text-primary border border-primary/20 shadow-sm'
+                        : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+                    }`}
+                  >
+                    <Icon className="w-5 h-5 mr-4" />
+                    <span className="font-medium text-base">{link.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+            
+            <hr className="my-6" />
+            
+            {/* Theme Toggle */}
+            <div className="px-4 py-3">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium text-foreground">Appearance</span>
+              </div>
+              <ThemeToggle />
+            </div>
           </div>
           
-          <hr className="my-4" />
-          
-          <Link
-            href="/profile"
-            className="flex items-center text-muted-foreground hover:bg-muted px-4 py-2 rounded-lg"
-          >
-            <User className="w-5 h-5 mr-3" />
-            Profile
-          </Link>
-          <Link
-            href="/settings"
-            className="flex items-center text-muted-foreground hover:bg-muted px-4 py-2 rounded-lg"
-          >
-            <Settings className="w-5 h-5 mr-3" />
-            Settings
-          </Link>
-          <button
-            onClick={handleLogout}
-            className="flex items-center text-destructive hover:bg-muted px-4 py-2 rounded-lg text-left"
-          >
-            <LogOut className="w-5 h-5 mr-3" />
-            Logout
-          </button>
+          {/* Footer Actions */}
+          <div className="px-4 py-4 border-t border-border">
+            <div className="space-y-2">
+              <Link
+                href="/profile"
+                className="flex items-center text-muted-foreground hover:bg-muted/50 hover:text-foreground px-4 py-3 rounded-xl transition-all duration-200"
+              >
+                <User className="w-5 h-5 mr-4" />
+                <span className="font-medium">Profile</span>
+              </Link>
+              <Link
+                href="/settings"
+                className="flex items-center text-muted-foreground hover:bg-muted/50 hover:text-foreground px-4 py-3 rounded-xl transition-all duration-200"
+              >
+                <Settings className="w-5 h-5 mr-4" />
+                <span className="font-medium">Settings</span>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="flex items-center w-full text-destructive hover:bg-destructive/10 px-4 py-3 rounded-xl transition-all duration-200"
+              >
+                <LogOut className="w-5 h-5 mr-4" />
+                <span className="font-medium">Logout</span>
+              </button>
+            </div>
+          </div>
         </div>
       </SheetContent>
     </Sheet>
@@ -184,35 +213,44 @@ export default function Navbar({ user }: NavbarProps) {
   }
 
   return (
-    <nav className="bg-background shadow-sm border-b border-border">
+    <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link href="/dashboard" className="text-xl font-bold text-foreground">
-              PFW
+            <Link href="/dashboard" className="flex items-center space-x-2 group">
+              <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/70 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+                <TrendingUp className="w-4 h-4 text-primary-foreground" />
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                FinanceTracker
+              </span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`text-sm font-medium transition-colors ${
-                  pathname === link.href
-                    ? 'text-primary border-b-2 border-primary pb-1'
-                    : 'text-muted-foreground hover:text-primary'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+          <div className="hidden lg:flex items-center space-x-1">
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    pathname === link.href
+                      ? 'bg-primary/10 text-primary border border-primary/20'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{link.label}</span>
+                </Link>
+              );
+            })}
           </div>
 
           {/* User Profile / Mobile Menu */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             <div className="hidden md:block">
               <ThemeToggle />
             </div>

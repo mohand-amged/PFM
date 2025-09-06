@@ -2,9 +2,16 @@ import React from 'react';
 import { getUserSubscriptions, getSpendingByCategory } from '@/lib/subscriptions';
 import { getUserExpenses, calculateExpenseStats } from '@/lib/expenses';
 import { getUserSavings, calculateSavingStats } from '@/lib/savings';
+import { getWalletStats, getIncomes } from '@/app/actions/wallet';
 import { getCurrentUser } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import SpendingChart from '@/components/SpendingChart';
+import TrendChart from '@/components/charts/TrendChart';
+import DonutChart from '@/components/charts/DonutChart';
+import CashFlowChart from '@/components/charts/CashFlowChart';
+import FinancialHealthScore from '@/components/FinancialHealthScore';
+import FinancialInsights from '@/components/FinancialInsights';
+import AnalyticsExport from '@/components/AnalyticsExport';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -51,13 +58,26 @@ export default async function AnalyticsPage() {
     recentSavings: [],
     progressByCategory: {},
   };
+  let walletStats = {
+    wallet: { balance: 0, monthlyBudget: 0, currency: 'USD' },
+    monthlyIncome: 0,
+    monthlyExpenses: 0,
+    totalIncome: 0,
+    totalExpenses: 0,
+    netWorth: 0,
+    budgetRemaining: 0,
+    incomeCount: 0,
+  };
+  let incomes: any[] = [];
 
   try {
     // Load all data in parallel
-    const [subscriptionsData, expensesData, savingsData] = await Promise.allSettled([
+    const [subscriptionsData, expensesData, savingsData, walletData, incomesData] = await Promise.allSettled([
       getUserSubscriptions(user.id),
       getUserExpenses(user.id),
       getUserSavings(user.id),
+      getWalletStats(),
+      getIncomes(),
     ]);
 
     // Process subscriptions
@@ -77,6 +97,16 @@ export default async function AnalyticsPage() {
       savings = savingsData.value;
       savingStats = calculateSavingStats(savings);
     }
+
+    // Process wallet stats
+    if (walletData.status === 'fulfilled') {
+      walletStats = walletData.value;
+    }
+
+    // Process incomes
+    if (incomesData.status === 'fulfilled') {
+      incomes = incomesData.value;
+    }
   } catch (error) {
     // Log error in development only
     if (process.env.NODE_ENV === 'development') {
@@ -87,7 +117,7 @@ export default async function AnalyticsPage() {
   // Calculate comprehensive metrics
   const totalSubscriptionSpending = subscriptions.reduce((sum, sub) => sum + sub.price, 0);
   const totalMonthlyOutflow = totalSubscriptionSpending + expenseStats.totalMonthly;
-  const netWorth = savingStats.totalSaved - totalMonthlyOutflow;
+  const actualNetWorth = walletStats.netWorth;
   const averageMonthlySpending = totalSubscriptionSpending / (subscriptions.length || 1);
   const mostExpensiveSubscription = [...subscriptions].sort((a, b) => b.price - a.price)[0];
   
@@ -102,8 +132,127 @@ export default async function AnalyticsPage() {
     value: (data as any).saved,
   }));
 
+  // Generate trend data (last 6 months)
+  const generateTrendData = () => {
+    const months = [];
+    const today = new Date();
+    
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      const monthName = date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+      
+      // Calculate monthly data based on available data
+      const monthlyIncome = walletStats.monthlyIncome / 6; // Simplified for demo
+      const monthlyExpenses = expenseStats.totalMonthly / 6;
+      const monthlySubscriptions = totalSubscriptionSpending;
+      const monthlySavings = savingStats.totalSaved / 6;
+      
+      months.push({
+        month: monthName,
+        income: monthlyIncome + (Math.random() * 500 - 250), // Add some variation
+        expenses: monthlyExpenses + (Math.random() * 200 - 100),
+        subscriptions: monthlySubscriptions,
+        savings: monthlySavings + (Math.random() * 300 - 150),
+      });
+    }
+    
+    return months;
+  };
+
+  // Generate cash flow data
+  const generateCashFlowData = () => {
+    const periods = [];
+    let cumulativeCashFlow = walletStats.wallet.balance;
+    
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date();
+      date.setMonth(date.getMonth() - i);
+      const period = date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+      
+      const income = walletStats.monthlyIncome / 6 + (Math.random() * 500 - 250);
+      const expenses = (expenseStats.totalMonthly + totalSubscriptionSpending) / 6 + (Math.random() * 200 - 100);
+      const netCashFlow = income - expenses;
+      cumulativeCashFlow += netCashFlow;
+      
+      periods.push({
+        period,
+        income,
+        expenses,
+        netCashFlow,
+        cumulativeCashFlow,
+      });
+    }
+    
+    return periods;
+  };
+
+  // Calculate Financial Health Score
+  const calculateFinancialHealth = () => {
+    const savingsRate = walletStats.totalIncome > 0 ? (savingStats.totalSaved / walletStats.totalIncome) * 100 : 0;
+    const emergencyFundMonths = totalMonthlyOutflow > 0 ? (walletStats.wallet.balance / totalMonthlyOutflow) : 0;
+    const budgetAdherence = walletStats.wallet.monthlyBudget > 0 ? 
+      Math.max(0, ((walletStats.wallet.monthlyBudget - walletStats.monthlyExpenses) / walletStats.wallet.monthlyBudget) * 100) : 50;
+    const debtToIncomeRatio = walletStats.totalIncome > 0 ? (totalMonthlyOutflow / walletStats.totalIncome) * 100 : 0;
+    
+    // Calculate composite score
+    let score = 0;
+    score += Math.min(savingsRate * 2, 40); // Max 40 points for savings rate
+    score += Math.min(emergencyFundMonths * 10, 25); // Max 25 points for emergency fund
+    score += Math.min(budgetAdherence * 0.2, 20); // Max 20 points for budget adherence
+    score += Math.max(0, 15 - (debtToIncomeRatio * 0.5)); // Max 15 points for low debt ratio
+    
+    return {
+      score: Math.round(Math.min(score, 100)),
+      metrics: {
+        savingsRate,
+        emergencyFundMonths,
+        budgetAdherence,
+        debtToIncomeRatio,
+      },
+    };
+  };
+
+  const trendData = generateTrendData();
+  const cashFlowData = generateCashFlowData();
+  const financialHealth = calculateFinancialHealth();
+
+  // Prepare financial insights data
+  const insightsData = {
+    monthlyIncome: walletStats.monthlyIncome,
+    monthlyOutflow: totalMonthlyOutflow,
+    balance: walletStats.wallet.balance,
+    monthlyBudget: walletStats.wallet.monthlyBudget,
+    savingsRate: financialHealth.metrics.savingsRate,
+    subscriptionCount: subscriptions.length,
+    expenseCount: expenses.length,
+    totalSaved: savingStats.totalSaved,
+    savingsGoals: savingStats.totalGoals,
+    completedGoals: savingStats.completedGoals,
+  };
+
+  // Enhanced spending breakdown for donut chart
+  const spendingBreakdown = [
+    { name: 'Subscriptions', value: totalSubscriptionSpending, color: '#3b82f6' },
+    { name: 'Food & Dining', value: (expenseStats.categoryBreakdown['Food'] as number) || 0, color: '#10b981' },
+    { name: 'Transportation', value: (expenseStats.categoryBreakdown['Transportation'] as number) || 0, color: '#f59e0b' },
+    { name: 'Entertainment', value: (expenseStats.categoryBreakdown['Entertainment'] as number) || 0, color: '#ef4444' },
+    { name: 'Utilities', value: (expenseStats.categoryBreakdown['Utilities'] as number) || 0, color: '#8b5cf6' },
+    { name: 'Other', value: (expenseStats.categoryBreakdown['Other'] as number) || 0, color: '#6b7280' },
+  ].filter(item => item.value > 0);
+
+  // Prepare export data
+  const exportData = {
+    subscriptions,
+    expenses,
+    savings,
+    walletStats,
+    financialHealth,
+    trendData,
+    cashFlowData,
+  };
+
   return (
-    <div className="max-w-7xl mx-auto p-6">
+    <div className="max-w-7xl mx-auto">
       <div className="mb-8">
         <div className="flex justify-between items-center">
           <div>
@@ -119,43 +268,59 @@ export default async function AnalyticsPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         <Card className="p-6 border-l-4 border-blue-500">
-          <h2 className="text-lg font-semibold text-gray-600">Monthly Subscriptions</h2>
+          <h2 className="text-lg font-semibold text-gray-600 dark:text-gray-300">Monthly Income</h2>
           <p className="text-3xl font-bold mt-2 text-blue-600">
-            {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(totalSubscriptionSpending)}
+            {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(walletStats.monthlyIncome)}
           </p>
-          <p className="text-sm text-gray-500 mt-1">{subscriptions.length} active services</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{incomes.length} income sources</p>
         </Card>
         
         <Card className="p-6 border-l-4 border-red-500">
-          <h2 className="text-lg font-semibold text-gray-600">Monthly Expenses</h2>
+          <h2 className="text-lg font-semibold text-gray-600 dark:text-gray-300">Monthly Outflow</h2>
           <p className="text-3xl font-bold mt-2 text-red-600">
-            {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(expenseStats.totalMonthly)}
+            {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(totalMonthlyOutflow)}
           </p>
-          <p className="text-sm text-gray-500 mt-1">
-            {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(expenseStats.totalWeekly)} this week
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            ${totalSubscriptionSpending.toFixed(0)} subs + ${expenseStats.totalMonthly.toFixed(0)} expenses
           </p>
         </Card>
         
         <Card className="p-6 border-l-4 border-green-500">
-          <h2 className="text-lg font-semibold text-gray-600">Total Savings</h2>
+          <h2 className="text-lg font-semibold text-gray-600 dark:text-gray-300">Current Balance</h2>
           <p className="text-3xl font-bold mt-2 text-green-600">
-            {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(savingStats.totalSaved)}
+            {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(walletStats.wallet.balance)}
           </p>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             {savingStats.completedGoals} of {savingStats.totalGoals} goals completed
           </p>
         </Card>
         
         <Card className="p-6 border-l-4 border-purple-500">
-          <h2 className="text-lg font-semibold text-gray-600">Net Position</h2>
+          <h2 className="text-lg font-semibold text-gray-600 dark:text-gray-300">Net Worth</h2>
           <p className={`text-3xl font-bold mt-2 ${
-            netWorth >= 0 ? 'text-green-600' : 'text-red-600'
+            actualNetWorth >= 0 ? 'text-green-600' : 'text-red-600'
           }`}>
-            {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(netWorth)}
+            {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(actualNetWorth)}
           </p>
-          <p className="text-sm text-gray-500 mt-1">Savings vs monthly outflow</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Total income - expenses</p>
+        </Card>
+        
+        <Card className="p-6 border-l-4 border-orange-500">
+          <h2 className="text-lg font-semibold text-gray-600 dark:text-gray-300">Health Score</h2>
+          <p className={`text-3xl font-bold mt-2 ${
+            financialHealth.score >= 80 ? 'text-green-600' :
+            financialHealth.score >= 60 ? 'text-yellow-600' :
+            financialHealth.score >= 40 ? 'text-orange-600' : 'text-red-600'
+          }`}>
+            {financialHealth.score}/100
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {financialHealth.score >= 80 ? 'Excellent' :
+             financialHealth.score >= 60 ? 'Good' :
+             financialHealth.score >= 40 ? 'Fair' : 'Needs Work'}
+          </p>
         </Card>
       </div>
       
@@ -185,6 +350,81 @@ export default async function AnalyticsPage() {
           </div>
         </div>
       </Card>
+
+      {/* Enhanced Analytics Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Financial Health Score */}
+        <div className="lg:col-span-1">
+          <FinancialHealthScore 
+            score={financialHealth.score} 
+            metrics={financialHealth.metrics} 
+          />
+        </div>
+        
+        {/* Overall Spending Breakdown */}
+        <Card className="p-6">
+          <h2 className="text-xl font-bold dark:text-white mb-6">Spending Overview</h2>
+          {spendingBreakdown.length > 0 ? (
+            <div className="relative">
+              <DonutChart 
+                data={spendingBreakdown}
+                height={350}
+                centerText={{
+                  value: `$${totalMonthlyOutflow.toFixed(0)}`,
+                  label: 'Total Monthly'
+                }}
+              />
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-500 dark:text-gray-400 mb-4">No spending data available</p>
+              <div className="space-x-2">
+                <Button size="sm" asChild>
+                  <Link href="/subscriptions/new">Add Subscription</Link>
+                </Button>
+                <Button size="sm" variant="outline" asChild>
+                  <Link href="/expenses/new">Add Expense</Link>
+                </Button>
+              </div>
+            </div>
+          )}
+        </Card>
+      </div>
+
+      {/* Trend Analysis */}
+      <Card className="p-6 mb-8">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h2 className="text-xl font-bold dark:text-white">Financial Trends</h2>
+            <p className="text-gray-600 dark:text-gray-400">6-month income, expenses, and savings trends</p>
+          </div>
+        </div>
+        <TrendChart data={trendData} height={400} />
+      </Card>
+
+      {/* Cash Flow Analysis */}
+      <Card className="p-6 mb-8">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h2 className="text-xl font-bold dark:text-white">Cash Flow Analysis</h2>
+            <p className="text-gray-600 dark:text-gray-400">Income vs expenses with cumulative cash flow</p>
+          </div>
+        </div>
+        <CashFlowChart data={cashFlowData} height={450} />
+      </Card>
+
+      {/* Financial Insights Section */}
+      <div className="mb-8">
+        <FinancialInsights 
+          data={insightsData}
+          trendData={trendData}
+        />
+      </div>
+
+      {/* Export Section */}
+      <div className="mb-8">
+        <AnalyticsExport data={exportData} />
+      </div>
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">

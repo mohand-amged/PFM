@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { deleteExpense, getExpenseStats } from '@/app/actions/expenses';
+import { useState } from 'react';
+import { deleteExpenseById } from '@/app/actions/expenses';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Trash2, Edit, Calendar, DollarSign, Receipt, Plus } from 'lucide-react';
@@ -56,12 +56,11 @@ export default function ExpensesClient({
     if (!confirm('Are you sure you want to delete this expense?')) return;
     
     try {
-      await deleteExpense(id);
+      await deleteExpenseById(id);
       // Optimistically update UI
       setExpenses(prev => prev.filter(expense => expense.id !== id));
-      // Reload stats to ensure accuracy
-      const newStats = await getExpenseStats();
-      setStats(newStats);
+      // Refresh page to get updated stats
+      window.location.reload();
     } catch (error) {
       console.error('Error deleting expense:', error);
       alert('Failed to delete expense. Please try again.');
