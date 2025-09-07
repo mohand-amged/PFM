@@ -169,3 +169,38 @@ body {
 input[type="radio"] {
   accent-color: var(--primary);
 }
+
+/* Line clamp utilities for better text truncation */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* Touch manipulation for better mobile interaction */
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Better tap target sizes for mobile */
+@media (max-width: 640px) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

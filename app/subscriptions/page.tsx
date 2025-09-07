@@ -57,25 +57,25 @@ export default async function SubscriptionsPage() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <div className="mb-8">
-        <div className="flex justify-between items-center">
+    <div className="max-w-7xl mx-auto p-4 sm:p-6">
+      <div className="mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">My Subscriptions</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Subscriptions</h1>
             <p className="text-gray-600 mt-2">Manage all your recurring subscriptions in one place</p>
           </div>
-          <Button asChild>
-            <Link href="/subscriptions/new">
+          <Link href="/subscriptions/new">
+            <Button className="w-full sm:w-auto">
               <Plus className="w-4 h-4 mr-2" />
               Add Subscription
-            </Link>
-          </Button>
+            </Button>
+          </Link>
         </div>
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card className="p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <Card className="p-4 sm:p-6">
           <div className="flex items-center">
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
               <DollarSign className="w-6 h-6 text-blue-600" />
@@ -89,7 +89,7 @@ export default async function SubscriptionsPage() {
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-4 sm:p-6">
           <div className="flex items-center">
             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
               <Calendar className="w-6 h-6 text-green-600" />
@@ -101,7 +101,7 @@ export default async function SubscriptionsPage() {
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-4 sm:p-6">
           <div className="flex items-center">
             <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
               <Calendar className="w-6 h-6 text-orange-600" />
@@ -116,41 +116,43 @@ export default async function SubscriptionsPage() {
 
       {/* Subscriptions List */}
       {subscriptions.length > 0 ? (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {subscriptions.map((sub) => {
             const daysUntil = getDaysUntilBilling(sub.billingDate);
             const isUpcoming = daysUntil >= 0 && daysUntil <= 7;
             const isOverdue = daysUntil < 0;
 
             return (
-              <Card key={sub.id} className={`p-6 transition-all hover:shadow-md ${isUpcoming ? 'ring-2 ring-orange-200' : ''} ${isOverdue ? 'ring-2 ring-red-200' : ''}`}>
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h2 className="text-xl font-semibold text-gray-900">{sub.name}</h2>
-                      {isUpcoming && (
-                        <span className="px-2 py-1 text-xs font-medium bg-orange-100 text-orange-800 rounded-full">
-                          Renews in {daysUntil} days
-                        </span>
-                      )}
-                      {isOverdue && (
-                        <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">
-                          Overdue
-                        </span>
-                      )}
+              <Card key={sub.id} className={`p-4 sm:p-6 transition-all hover:shadow-md ${isUpcoming ? 'ring-2 ring-orange-200' : ''} ${isOverdue ? 'ring-2 ring-red-200' : ''}`}>
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-3">
+                      <h2 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">{sub.name}</h2>
+                      <div className="flex flex-wrap gap-2">
+                        {isUpcoming && (
+                          <span className="px-2 py-1 text-xs font-medium bg-orange-100 text-orange-800 rounded-full">
+                            Renews in {daysUntil} days
+                          </span>
+                        )}
+                        {isOverdue && (
+                          <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">
+                            Overdue
+                          </span>
+                        )}
+                      </div>
                     </div>
                     
-                    <div className="flex items-center gap-6 text-gray-600 mb-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-gray-600 mb-3">
                       <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4" />
-                        <span className="text-lg font-semibold">
+                        <DollarSign className="w-4 h-4 flex-shrink-0" />
+                        <span className="text-base sm:text-lg font-semibold">
                           {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(sub.price)}
                         </span>
                         <span className="text-sm">per month</span>
                       </div>
                       
                       <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
+                        <Calendar className="w-4 h-4 flex-shrink-0" />
                         <span className="text-sm">
                           Next: {formatDisplayDate(sub.billingDate)}
                         </span>
@@ -158,15 +160,15 @@ export default async function SubscriptionsPage() {
                     </div>
 
                     {sub.description && (
-                      <p className="text-gray-600 mb-3">{sub.description}</p>
+                      <p className="text-sm sm:text-base text-gray-600 mb-3 line-clamp-2">{sub.description}</p>
                     )}
 
                     {sub.categories && sub.categories.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-2 mb-3 sm:mb-0">
                         {sub.categories.map((category) => (
                           <span
                             key={category}
-                            className="px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800 rounded-full"
+                            className="px-3 py-1 text-xs sm:text-sm font-medium bg-blue-100 text-blue-800 rounded-full"
                           >
                             {category}
                           </span>
@@ -175,24 +177,28 @@ export default async function SubscriptionsPage() {
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2 ml-4">
-                    <Button variant="outline" size="sm" asChild>
+                  <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-2 flex-shrink-0">
+                    <div className="flex items-center gap-2">
                       <Link href={`/subscriptions/${sub.id}/edit`}>
-                        <Edit className="w-4 h-4" />
+                        <Button variant="outline" size="sm" className="h-8 w-8 sm:h-9 sm:w-9 p-0 touch-manipulation">
+                          <Edit className="w-4 h-4" />
+                          <span className="sr-only">Edit subscription</span>
+                        </Button>
                       </Link>
-                    </Button>
-                    
-                    <form action={deleteSubscription}>
-                      <input type="hidden" name="id" value={sub.id} />
-                      <Button
-                        type="submit"
-                        variant="outline"
-                        size="sm"
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </form>
+                      
+                      <form action={deleteSubscription}>
+                        <input type="hidden" name="id" value={sub.id} />
+                        <Button
+                          type="submit"
+                          variant="outline"
+                          size="sm"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 sm:h-9 sm:w-9 p-0 touch-manipulation"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          <span className="sr-only">Delete subscription</span>
+                        </Button>
+                      </form>
+                    </div>
                   </div>
                 </div>
               </Card>
@@ -211,17 +217,17 @@ export default async function SubscriptionsPage() {
               Keep track of costs, renewal dates, and spending patterns.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button asChild>
-                <Link href="/subscriptions/new">
+              <Link href="/subscriptions/new">
+                <Button className="w-full sm:w-auto">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Your First Subscription
-                </Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link href="/dashboard">
+                </Button>
+              </Link>
+              <Link href="/dashboard">
+                <Button variant="outline" className="w-full sm:w-auto">
                   Back to Dashboard
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             </div>
           </div>
         </Card>
@@ -229,7 +235,7 @@ export default async function SubscriptionsPage() {
 
       {/* Upcoming Renewals Alert */}
       {upcomingRenewals.length > 0 && (
-        <Card className="p-6 mt-8 bg-orange-50 border-orange-200">
+        <Card className="p-4 sm:p-6 mt-6 sm:mt-8 bg-orange-50 border-orange-200">
           <div className="flex items-start">
             <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
               <Calendar className="w-5 h-5 text-orange-600" />

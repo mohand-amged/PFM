@@ -67,15 +67,15 @@ export default async function SavingsPage() {
   const overallProgress = stats.totalTarget > 0 ? (stats.totalSavings / stats.totalTarget) * 100 : 0;
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <div className="mb-8">
-        <div className="flex justify-between items-center">
+    <div className="max-w-7xl mx-auto p-4 sm:p-6">
+      <div className="mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">My Savings</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Savings</h1>
             <p className="text-gray-600 mt-2">Track your saving goals and build financial security</p>
           </div>
           <Link href="/savings/new">
-            <Button>
+            <Button className="w-full sm:w-auto">
               <Plus className="w-4 h-4 mr-2" />
               Add Saving Goal
             </Button>
@@ -84,55 +84,55 @@ export default async function SavingsPage() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card className="p-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+        <Card className="p-3 sm:p-6">
           <div className="flex items-center">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-green-600" />
+            <div className="w-8 h-8 sm:w-12 sm:h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <DollarSign className="w-4 h-4 sm:w-6 sm:h-6 text-green-600" />
             </div>
-            <div className="ml-4">
-              <h3 className="text-lg font-semibold text-gray-600">Total Saved</h3>
-              <p className="text-2xl font-bold">
+            <div className="ml-2 sm:ml-4 min-w-0">
+              <h3 className="text-xs sm:text-lg font-semibold text-gray-600 truncate">Total Saved</h3>
+              <p className="text-sm sm:text-2xl font-bold truncate">
                 {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(stats.totalSavings)}
               </p>
             </div>
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-3 sm:p-6">
           <div className="flex items-center">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Target className="w-6 h-6 text-blue-600" />
+            <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Target className="w-4 h-4 sm:w-6 sm:h-6 text-blue-600" />
             </div>
-            <div className="ml-4">
-              <h3 className="text-lg font-semibold text-gray-600">Target Amount</h3>
-              <p className="text-2xl font-bold">
+            <div className="ml-2 sm:ml-4 min-w-0">
+              <h3 className="text-xs sm:text-lg font-semibold text-gray-600 truncate">Target Amount</h3>
+              <p className="text-sm sm:text-2xl font-bold truncate">
                 {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(stats.totalTarget)}
               </p>
             </div>
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-3 sm:p-6">
           <div className="flex items-center">
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-              <Calendar className="w-6 h-6 text-purple-600" />
+            <div className="w-8 h-8 sm:w-12 sm:h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Calendar className="w-4 h-4 sm:w-6 sm:h-6 text-purple-600" />
             </div>
-            <div className="ml-4">
-              <h3 className="text-lg font-semibold text-gray-600">Active Goals</h3>
-              <p className="text-2xl font-bold">{stats.activeSavingsCount}</p>
+            <div className="ml-2 sm:ml-4 min-w-0">
+              <h3 className="text-xs sm:text-lg font-semibold text-gray-600 truncate">Active Goals</h3>
+              <p className="text-sm sm:text-2xl font-bold">{stats.activeSavingsCount}</p>
             </div>
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-3 sm:p-6">
           <div className="flex items-center">
-            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-              <Target className="w-6 h-6 text-orange-600" />
+            <div className="w-8 h-8 sm:w-12 sm:h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Target className="w-4 h-4 sm:w-6 sm:h-6 text-orange-600" />
             </div>
-            <div className="ml-4">
-              <h3 className="text-lg font-semibold text-gray-600">Overall Progress</h3>
-              <p className="text-2xl font-bold">{Math.round(overallProgress)}%</p>
+            <div className="ml-2 sm:ml-4 min-w-0">
+              <h3 className="text-xs sm:text-lg font-semibold text-gray-600 truncate">Overall Progress</h3>
+              <p className="text-sm sm:text-2xl font-bold">{Math.round(overallProgress)}%</p>
             </div>
           </div>
         </Card>
@@ -140,7 +140,7 @@ export default async function SavingsPage() {
 
       {/* Savings List */}
       {savings.length > 0 ? (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {savings.map((saving) => {
             const progress = saving.targetAmount && saving.targetAmount > 0 
               ? (saving.amount / saving.targetAmount) * 100 
@@ -148,27 +148,29 @@ export default async function SavingsPage() {
             const isCompleted = progress >= 100;
 
             return (
-              <Card key={saving.id} className={`p-6 transition-all hover:shadow-md ${!saving.isActive ? 'opacity-70' : ''} ${isCompleted ? 'ring-2 ring-green-200 bg-green-50' : ''}`}>
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h2 className="text-xl font-semibold text-gray-900">{saving.name}</h2>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        saving.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {saving.isActive ? 'Active' : 'Paused'}
-                      </span>
-                      {isCompleted && (
-                        <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                          Goal Achieved! 🎉
+              <Card key={saving.id} className={`p-4 sm:p-6 transition-all hover:shadow-md ${!saving.isActive ? 'opacity-70' : ''} ${isCompleted ? 'ring-2 ring-green-200 bg-green-50' : ''}`}>
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-3">
+                      <h2 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">{saving.name}</h2>
+                      <div className="flex flex-wrap gap-2">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          saving.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {saving.isActive ? 'Active' : 'Paused'}
                         </span>
-                      )}
+                        {isCompleted && (
+                          <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                            Goal Achieved! 🎉
+                          </span>
+                        )}
+                      </div>
                     </div>
                     
-                    <div className="flex items-center gap-6 text-gray-600 mb-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-gray-600 mb-4">
                       <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4" />
-                        <span className="text-lg font-semibold">
+                        <DollarSign className="w-4 h-4 flex-shrink-0" />
+                        <span className="text-base sm:text-lg font-semibold">
                           {new Intl.NumberFormat('en-US', { style: 'currency', currency: saving.currency || 'USD' }).format(saving.amount)}
                         </span>
                         {saving.targetAmount && (
@@ -179,7 +181,7 @@ export default async function SavingsPage() {
                       </div>
                       
                       <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
+                        <Calendar className="w-4 h-4 flex-shrink-0" />
                         <span className="text-sm">
                           Started: {formatDisplayDate(saving.date)}
                         </span>
@@ -198,48 +200,53 @@ export default async function SavingsPage() {
                     )}
 
                     {saving.description && (
-                      <p className="text-gray-600 mb-3">{saving.description}</p>
+                      <p className="text-sm sm:text-base text-gray-600 mb-3 line-clamp-2">{saving.description}</p>
                     )}
 
                     {saving.category && (
-                      <div className="flex flex-wrap gap-2">
-                        <span className="px-3 py-1 text-sm font-medium bg-indigo-100 text-indigo-800 rounded-full">
+                      <div className="flex flex-wrap gap-2 mb-3 sm:mb-0">
+                        <span className="px-3 py-1 text-xs sm:text-sm font-medium bg-indigo-100 text-indigo-800 rounded-full">
                           {saving.category}
                         </span>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2 ml-4">
-                    <form action={toggleSavingStatus}>
-                      <input type="hidden" name="id" value={saving.id} />
-                      <Button
-                        type="submit"
-                        variant="outline"
-                        size="sm"
-                        className={saving.isActive ? 'text-orange-600 hover:text-orange-700' : 'text-green-600 hover:text-green-700'}
-                      >
-                        {saving.isActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                      </Button>
-                    </form>
-                    
-                    <Link href={`/savings/${saving.id}/edit`}>
-                      <Button variant="outline" size="sm">
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                    </Link>
-                    
-                    <form action={deleteSaving}>
-                      <input type="hidden" name="id" value={saving.id} />
-                      <Button
-                        type="submit"
-                        variant="outline"
-                        size="sm"
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </form>
+                  <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-2 flex-shrink-0">
+                    <div className="flex items-center gap-2">
+                      <form action={toggleSavingStatus}>
+                        <input type="hidden" name="id" value={saving.id} />
+                        <Button
+                          type="submit"
+                          variant="outline"
+                          size="sm"
+                          className={`h-8 w-8 sm:h-9 sm:w-9 p-0 touch-manipulation ${saving.isActive ? 'text-orange-600 hover:text-orange-700' : 'text-green-600 hover:text-green-700'}`}
+                        >
+                          {saving.isActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                          <span className="sr-only">{saving.isActive ? 'Pause' : 'Resume'} saving goal</span>
+                        </Button>
+                      </form>
+                      
+                      <Link href={`/savings/${saving.id}/edit`}>
+                        <Button variant="outline" size="sm" className="h-8 w-8 sm:h-9 sm:w-9 p-0 touch-manipulation">
+                          <Edit className="w-4 h-4" />
+                          <span className="sr-only">Edit saving goal</span>
+                        </Button>
+                      </Link>
+                      
+                      <form action={deleteSaving}>
+                        <input type="hidden" name="id" value={saving.id} />
+                        <Button
+                          type="submit"
+                          variant="outline"
+                          size="sm"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 sm:h-9 sm:w-9 p-0 touch-manipulation"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          <span className="sr-only">Delete saving goal</span>
+                        </Button>
+                      </form>
+                    </div>
                   </div>
                 </div>
               </Card>
@@ -259,13 +266,13 @@ export default async function SavingsPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/savings/new">
-                <Button>
+                <Button className="w-full sm:w-auto">
                   <Plus className="w-4 h-4 mr-2" />
                   Set Your First Goal
                 </Button>
               </Link>
               <Link href="/dashboard">
-                <Button variant="outline">
+                <Button variant="outline" className="w-full sm:w-auto">
                   Back to Dashboard
                 </Button>
               </Link>
@@ -276,7 +283,7 @@ export default async function SavingsPage() {
 
       {/* Goal Progress Summary */}
       {stats.goalProgress.length > 0 && (
-        <Card className="p-6 mt-8">
+        <Card className="p-4 sm:p-6 mt-6 sm:mt-8">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Goal Progress Summary</h3>
           <div className="space-y-4">
             {stats.goalProgress.slice(0, 5).map((goal) => (
@@ -304,7 +311,7 @@ export default async function SavingsPage() {
 
       {/* Monthly Savings Alert */}
       {stats.thisMonthTotal > 0 && (
-        <Card className="p-6 mt-8 bg-green-50 border-green-200">
+        <Card className="p-4 sm:p-6 mt-6 sm:mt-8 bg-green-50 border-green-200">
           <div className="flex items-start">
             <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
               <Target className="w-5 h-5 text-green-600" />
