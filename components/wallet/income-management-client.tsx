@@ -131,24 +131,24 @@ export default function IncomeManagementClient({ stats, incomes, wallet }: Incom
       {/* Header */}
       <div className="mb-6 sm:mb-8">
         <div className="flex items-center gap-4 mb-4">
-          <EnhancedButton variant="outline" size="touch-sm" asChild>
-            <Link href="/wallet">
+          <Link href="/wallet">
+            <EnhancedButton variant="outline" size="touch-sm">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Wallet
-            </Link>
-          </EnhancedButton>
+            </EnhancedButton>
+          </Link>
         </div>
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Income Management</h1>
             <p className="text-gray-600 dark:text-gray-400 mt-2">Manage all your income sources and track your earnings</p>
           </div>
-          <EnhancedButton size="touch" asChild>
-            <Link href="/wallet/add-income">
+          <Link href="/wallet/add-income">
+            <EnhancedButton size="touch">
               <Plus className="w-4 h-4 mr-2" />
               Add Income
-            </Link>
-          </EnhancedButton>
+            </EnhancedButton>
+          </Link>
         </div>
       </div>
 
@@ -344,12 +344,12 @@ export default function IncomeManagementClient({ stats, incomes, wallet }: Incom
             }
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <EnhancedButton size="touch" asChild>
-              <Link href="/wallet/add-income">
+            <Link href="/wallet/add-income">
+              <EnhancedButton size="touch">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Income
-              </Link>
-            </EnhancedButton>
+              </EnhancedButton>
+            </Link>
             {(searchTerm || filterType !== 'ALL') && (
               <EnhancedButton 
                 variant="outline" 

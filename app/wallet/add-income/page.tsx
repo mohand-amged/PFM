@@ -22,12 +22,12 @@ export default async function AddIncomePage() {
     <div className="max-w-2xl mx-auto p-4 sm:p-6">
       <div className="mb-6 sm:mb-8">
         <div className="flex items-center gap-4 mb-4">
-          <EnhancedButton variant="outline" size="touch-sm" asChild>
-            <Link href="/wallet">
+          <Link href="/wallet">
+            <EnhancedButton variant="outline" size="touch-sm">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Wallet
-            </Link>
-          </EnhancedButton>
+            </EnhancedButton>
+          </Link>
         </div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Add Income</h1>
         <p className="text-gray-600 mt-2">Record your salary, freelance work, or other income sources</p>
@@ -143,11 +143,11 @@ export default async function AddIncomePage() {
           </div>
 
           <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
-            <EnhancedButton type="button" variant="outline" size="touch" asChild className="sm:order-1">
-              <Link href="/wallet">
+            <Link href="/wallet" className="sm:order-1">
+              <EnhancedButton type="button" variant="outline" size="touch" className="w-full sm:w-auto">
                 Cancel
-              </Link>
-            </EnhancedButton>
+              </EnhancedButton>
+            </Link>
             <EnhancedButton type="submit" size="touch" className="sm:order-2">
               <Plus className="w-4 h-4 mr-2" />
               Add Income

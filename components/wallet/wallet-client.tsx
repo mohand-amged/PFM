@@ -73,21 +73,40 @@ function getIncomeTypeColor(type: string) {
 }
 
 export default function WalletClient({ stats, incomes, wallet }: WalletClientProps) {
-  const budgetUsagePercent = stats.wallet.monthlyBudget 
-    ? Math.min((stats.monthlyExpenses / stats.wallet.monthlyBudget) * 100, 100)
+  // Add null checks and default values
+  const safeStats = stats || {
+    wallet: { balance: 0, monthlyBudget: 0, currency: 'USD' },
+    monthlyIncome: 0,
+    monthlyExpenses: 0,
+    totalIncome: 0,
+    totalExpenses: 0,
+    netWorth: 0,
+    budgetRemaining: 0,
+    incomeCount: 0
+  };
+  
+  const safeIncomes = incomes || [];
+  const safeWallet = wallet || { balance: 0, monthlyBudget: 0, currency: 'USD' };
+
+  const budgetUsagePercent = safeStats.wallet.monthlyBudget 
+    ? Math.min((safeStats.monthlyExpenses / safeStats.wallet.monthlyBudget) * 100, 100)
     : 0;
 
-  const isLowBalance = stats.wallet.monthlyBudget 
-    ? stats.wallet.balance < (stats.wallet.monthlyBudget * 0.2)
+  const isLowBalance = safeStats.wallet.monthlyBudget 
+    ? safeStats.wallet.balance < (safeStats.wallet.monthlyBudget * 0.2)
     : false;
 
   const handleDeleteIncome = async (incomeId: string, shouldUpdateWallet: boolean = true) => {
-    const formData = new FormData();
-    formData.append('incomeId', incomeId);
-    if (shouldUpdateWallet) {
-      formData.append('updateWallet', 'on');
+    try {
+      const formData = new FormData();
+      formData.append('incomeId', incomeId);
+      if (shouldUpdateWallet) {
+        formData.append('updateWallet', 'on');
+      }
+      await deleteIncome(formData);
+    } catch (error) {
+      console.error('Error deleting income:', error);
     }
-    await deleteIncome(formData);
   };
 
   return (
@@ -99,18 +118,18 @@ export default function WalletClient({ stats, incomes, wallet }: WalletClientPro
             <p className="text-gray-600 mt-2">Manage your balance, budget, and income</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
-            <EnhancedButton size="touch" asChild>
-              <Link href="/wallet/add-income">
+            <Link href="/wallet/add-income">
+              <EnhancedButton size="touch" className="w-full sm:w-auto">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Income
-              </Link>
-            </EnhancedButton>
-            <EnhancedButton variant="outline" size="touch" asChild>
-              <Link href="/wallet/settings">
+              </EnhancedButton>
+            </Link>
+            <Link href="/wallet/settings">
+              <EnhancedButton variant="outline" size="touch" className="w-full sm:w-auto">
                 <Wallet className="w-4 h-4 mr-2" />
                 Wallet Settings
-              </Link>
-            </EnhancedButton>
+              </EnhancedButton>
+            </Link>
           </div>
         </div>
       </div>
@@ -127,8 +146,8 @@ export default function WalletClient({ stats, incomes, wallet }: WalletClientPro
               <p className="text-lg sm:text-2xl font-bold">
                 {new Intl.NumberFormat('en-US', { 
                   style: 'currency', 
-                  currency: stats.wallet.currency || 'USD' 
-                }).format(stats.wallet.balance)}
+                  currency: safeStats.wallet.currency || 'USD' 
+                }).format(safeStats.wallet.balance)}
               </p>
               {isLowBalance && (
                 <div className="flex items-center text-red-600 text-xs sm:text-sm mt-1">
@@ -148,7 +167,7 @@ export default function WalletClient({ stats, incomes, wallet }: WalletClientPro
             <div className="ml-3 sm:ml-4 flex-1 min-w-0">
               <h3 className="text-sm sm:text-lg font-semibold text-gray-600 truncate">Monthly Income</h3>
               <p className="text-lg sm:text-2xl font-bold">
-                {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(stats.monthlyIncome)}
+                {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(safeStats.monthlyIncome)}
               </p>
             </div>
           </div>
@@ -162,7 +181,7 @@ export default function WalletClient({ stats, incomes, wallet }: WalletClientPro
             <div className="ml-3 sm:ml-4 flex-1 min-w-0">
               <h3 className="text-sm sm:text-lg font-semibold text-gray-600 truncate">Monthly Expenses</h3>
               <p className="text-lg sm:text-2xl font-bold">
-                {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(stats.monthlyExpenses)}
+                {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(safeStats.monthlyExpenses)}
               </p>
             </div>
           </div>
@@ -175,8 +194,8 @@ export default function WalletClient({ stats, incomes, wallet }: WalletClientPro
             </div>
             <div className="ml-3 sm:ml-4 flex-1 min-w-0">
               <h3 className="text-sm sm:text-lg font-semibold text-gray-600 truncate">Net Worth</h3>
-              <p className={`text-lg sm:text-2xl font-bold ${stats.netWorth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(stats.netWorth)}
+              <p className={`text-lg sm:text-2xl font-bold ${safeStats.netWorth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(safeStats.netWorth)}
               </p>
             </div>
           </div>
@@ -184,27 +203,27 @@ export default function WalletClient({ stats, incomes, wallet }: WalletClientPro
       </div>
 
       {/* Budget Progress */}
-      {stats.wallet.monthlyBudget > 0 && (
+      {safeStats.wallet.monthlyBudget > 0 && (
         <Card className="p-4 sm:p-6 mb-6 sm:mb-8">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg sm:text-xl font-bold text-gray-900">Monthly Budget</h2>
             <span className="text-xs sm:text-sm text-gray-500">
-              {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(stats.monthlyExpenses)} 
+              {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(safeStats.monthlyExpenses)} 
               {' of '}
-              {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(stats.wallet.monthlyBudget)}
+              {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(safeStats.wallet.monthlyBudget)}
             </span>
           </div>
           <Progress 
-            value={budgetUsagePercent} 
+            value={Math.max(0, Math.min(100, budgetUsagePercent || 0))} 
             className={`h-2 sm:h-3 ${budgetUsagePercent > 90 ? 'progress-red' : budgetUsagePercent > 75 ? 'progress-yellow' : 'progress-green'}`} 
           />
           <div className="flex justify-between items-center mt-2">
             <span className="text-xs sm:text-sm text-gray-600">
-              {budgetUsagePercent.toFixed(1)}% used
+              {(budgetUsagePercent || 0).toFixed(1)}% used
             </span>
-            <span className={`text-xs sm:text-sm font-medium ${stats.budgetRemaining >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {stats.budgetRemaining >= 0 ? 'Remaining: ' : 'Over budget: '}
-              {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Math.abs(stats.budgetRemaining))}
+            <span className={`text-xs sm:text-sm font-medium ${safeStats.budgetRemaining >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {safeStats.budgetRemaining >= 0 ? 'Remaining: ' : 'Over budget: '}
+              {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Math.abs(safeStats.budgetRemaining))}
             </span>
           </div>
         </Card>
@@ -216,23 +235,23 @@ export default function WalletClient({ stats, incomes, wallet }: WalletClientPro
           <div className="flex justify-between items-center mb-4 sm:mb-6">
             <h2 className="text-lg sm:text-xl font-bold text-gray-900">Recent Income</h2>
             <div className="flex flex-col sm:flex-row gap-2">
-              <EnhancedButton variant="outline" size="touch-sm" asChild>
-                <Link href="/wallet/income">
+              <Link href="/wallet/income">
+                <EnhancedButton variant="outline" size="touch-sm">
                   Manage All
-                </Link>
-              </EnhancedButton>
-              <EnhancedButton variant="outline" size="touch-sm" asChild>
-                <Link href="/wallet/add-income">
+                </EnhancedButton>
+              </Link>
+              <Link href="/wallet/add-income">
+                <EnhancedButton variant="outline" size="touch-sm">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Income
-                </Link>
-              </EnhancedButton>
+                </EnhancedButton>
+              </Link>
             </div>
           </div>
 
-          {incomes.length > 0 ? (
+          {safeIncomes.length > 0 ? (
             <div className="space-y-3 sm:space-y-4">
-              {incomes.slice(0, 5).map((income) => (
+              {safeIncomes.slice(0, 5).map((income) => (
                 <div key={income.id} className="flex items-center justify-between p-3 sm:p-4 border rounded-lg hover:bg-gray-50 transition-colors">
                   <div className="flex items-center flex-1 min-w-0">
                     <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
@@ -281,12 +300,12 @@ export default function WalletClient({ stats, incomes, wallet }: WalletClientPro
               </div>
               <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-1">No income recorded</h3>
               <p className="text-sm text-gray-500 mb-4">Start by adding your salary or other income sources.</p>
-              <EnhancedButton size="touch-sm" asChild>
-                <Link href="/wallet/add-income">
+              <Link href="/wallet/add-income">
+                <EnhancedButton size="touch-sm">
                   <Plus className="w-4 h-4 mr-2" />
                   Add Your First Income
-                </Link>
-              </EnhancedButton>
+                </EnhancedButton>
+              </Link>
             </div>
           )}
         </Card>
@@ -299,34 +318,34 @@ export default function WalletClient({ stats, incomes, wallet }: WalletClientPro
             <div className="flex justify-between items-center py-2 sm:py-3 border-b">
               <span className="text-gray-600 text-sm sm:text-base">Total Income</span>
               <span className="font-semibold text-green-600 text-sm sm:text-base">
-                +{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(stats.totalIncome)}
+                +{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(safeStats.totalIncome)}
               </span>
             </div>
             
             <div className="flex justify-between items-center py-2 sm:py-3 border-b">
               <span className="text-gray-600 text-sm sm:text-base">Total Expenses</span>
               <span className="font-semibold text-red-600 text-sm sm:text-base">
-                -{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(stats.totalExpenses)}
+                -{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(safeStats.totalExpenses)}
               </span>
             </div>
             
             <div className="flex justify-between items-center py-2 sm:py-3 border-b">
               <span className="text-gray-600 font-medium text-sm sm:text-base">Net Worth</span>
-              <span className={`font-bold text-base sm:text-lg ${stats.netWorth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(stats.netWorth)}
+              <span className={`font-bold text-base sm:text-lg ${safeStats.netWorth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(safeStats.netWorth)}
               </span>
             </div>
 
             <div className="pt-3 sm:pt-4 space-y-2 sm:space-y-3">
               <div className="flex justify-between items-center text-xs sm:text-sm">
                 <span className="text-gray-500">Income Sources</span>
-                <span className="text-gray-700">{stats.incomeCount}</span>
+                <span className="text-gray-700">{safeStats.incomeCount}</span>
               </div>
               
-              {wallet?.lastSalaryDate && (
+              {safeWallet?.lastSalaryDate && (
                 <div className="flex justify-between items-center text-xs sm:text-sm">
                   <span className="text-gray-500">Last Salary</span>
-                  <span className="text-gray-700">{formatDisplayDate(wallet.lastSalaryDate)}</span>
+                  <span className="text-gray-700">{formatDisplayDate(safeWallet.lastSalaryDate)}</span>
                 </div>
               )}
             </div>
@@ -334,18 +353,18 @@ export default function WalletClient({ stats, incomes, wallet }: WalletClientPro
 
           <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t">
             <div className="flex flex-col sm:flex-row gap-3">
-              <EnhancedButton variant="outline" size="touch-sm" asChild className="flex-1">
-                <Link href="/analytics">
+              <Link href="/analytics" className="flex-1">
+                <EnhancedButton variant="outline" size="touch-sm" className="w-full">
                   <Target className="w-4 h-4 mr-2" />
                   View Analytics
-                </Link>
-              </EnhancedButton>
-              <EnhancedButton variant="outline" size="touch-sm" asChild className="flex-1">
-                <Link href="/expenses">
+                </EnhancedButton>
+              </Link>
+              <Link href="/expenses" className="flex-1">
+                <EnhancedButton variant="outline" size="touch-sm" className="w-full">
                   <ArrowDownRight className="w-4 h-4 mr-2" />
                   View Expenses
-                </Link>
-              </EnhancedButton>
+                </EnhancedButton>
+              </Link>
             </div>
           </div>
         </Card>
