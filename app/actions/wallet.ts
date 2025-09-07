@@ -240,6 +240,63 @@ export async function getWalletStats() {
   }
 }
 
+// Delete income entry
+export async function deleteIncome(formData: FormData) {
+  const user = await getCurrentUser();
+  
+  if (!user) {
+    redirect('/login');
+  }
+
+  const incomeId = String(formData.get('incomeId') || '').trim();
+  const shouldUpdateWallet = formData.get('updateWallet') === 'on';
+
+  if (!incomeId) {
+    throw new Error('Income ID is required');
+  }
+
+  try {
+    // Get the income entry to delete
+    const income = await db.income.findUnique({
+      where: { 
+        id: incomeId,
+        userId: user.id, // Ensure user owns this income
+      },
+    });
+
+    if (!income) {
+      throw new Error('Income not found');
+    }
+
+    // Delete the income entry
+    await db.income.delete({
+      where: { id: incomeId },
+    });
+
+    // Update wallet balance if requested (subtract the income amount)
+    if (shouldUpdateWallet) {
+      await db.wallet.updateMany({
+        where: { userId: user.id },
+        data: {
+          balance: {
+            decrement: income.amount,
+          },
+        },
+      });
+    }
+
+    revalidatePath('/wallet');
+    revalidatePath('/dashboard');
+    revalidatePath('/analytics');
+    
+  } catch (error) {
+    console.error('Error deleting income:', error);
+    throw error;
+  }
+
+  redirect('/wallet');
+}
+
 // Deduct expense from wallet (called when expense is added)
 export async function deductFromWallet(amount: number) {
   const user = await getCurrentUser();
