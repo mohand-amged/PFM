@@ -74,12 +74,12 @@ export default async function SavingsPage() {
             <h1 className="text-3xl font-bold text-gray-900">My Savings</h1>
             <p className="text-gray-600 mt-2">Track your saving goals and build financial security</p>
           </div>
-          <Button asChild>
-            <Link href="/savings/new">
+          <Link href="/savings/new">
+            <Button>
               <Plus className="w-4 h-4 mr-2" />
               Add Saving Goal
-            </Link>
-          </Button>
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -223,11 +223,11 @@ export default async function SavingsPage() {
                       </Button>
                     </form>
                     
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href={`/savings/${saving.id}/edit`}>
+                    <Link href={`/savings/${saving.id}/edit`}>
+                      <Button variant="outline" size="sm">
                         <Edit className="w-4 h-4" />
-                      </Link>
-                    </Button>
+                      </Button>
+                    </Link>
                     
                     <form action={deleteSaving}>
                       <input type="hidden" name="id" value={saving.id} />
@@ -258,17 +258,17 @@ export default async function SavingsPage() {
               Whether it&apos;s an emergency fund, vacation, or major purchase - every goal counts!
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button asChild>
-                <Link href="/savings/new">
+              <Link href="/savings/new">
+                <Button>
                   <Plus className="w-4 h-4 mr-2" />
                   Set Your First Goal
-                </Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link href="/dashboard">
+                </Button>
+              </Link>
+              <Link href="/dashboard">
+                <Button variant="outline">
                   Back to Dashboard
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             </div>
           </div>
         </Card>

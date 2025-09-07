@@ -11,22 +11,23 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 export default async function NewExpensePage() {
-  const user = await getCurrentUser();
-  
-  if (!user) {
-    redirect('/login');
-  }
+  try {
+    const user = await getCurrentUser();
+    
+    if (!user) {
+      redirect('/login');
+    }
 
-  return (
+    return (
     <div className="max-w-2xl mx-auto p-4 sm:p-6">
       <div className="mb-6 sm:mb-8">
         <div className="flex items-center gap-4 mb-4">
-          <EnhancedButton variant="outline" size="touch-sm" asChild>
-            <Link href="/expenses">
+          <Link href="/expenses">
+            <EnhancedButton variant="outline" size="touch-sm">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Expenses
-            </Link>
-          </EnhancedButton>
+            </EnhancedButton>
+          </Link>
         </div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Add New Expense</h1>
         <p className="text-gray-600 mt-2">Record a new expense transaction</p>
@@ -114,11 +115,11 @@ export default async function NewExpensePage() {
           </div>
 
           <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
-            <EnhancedButton type="button" variant="outline" size="touch" asChild className="sm:order-1">
-              <Link href="/expenses">
+            <Link href="/expenses" className="sm:order-1">
+              <EnhancedButton type="button" variant="outline" size="touch" className="w-full sm:w-auto">
                 Cancel
-              </Link>
-            </EnhancedButton>
+              </EnhancedButton>
+            </Link>
             <EnhancedButton type="submit" size="touch" className="sm:order-2">
               <Plus className="w-4 h-4 mr-2" />
               Add Expense
@@ -127,5 +128,26 @@ export default async function NewExpensePage() {
         </form>
       </Card>
     </div>
-  );
+    );
+  } catch (error) {
+    console.error('Error loading add expense page:', error);
+    return (
+      <div className="max-w-2xl mx-auto p-4 sm:p-6">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Add New Expense</h1>
+          <p className="text-gray-600 mt-2">Record a new expense transaction</p>
+        </div>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+          <h2 className="text-lg font-semibold text-red-900 mb-2">Error Loading Form</h2>
+          <p className="text-red-700 mb-4">There was an issue loading the expense form. Please try again.</p>
+          <a 
+            href="/expenses" 
+            className="inline-block bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Back to Expenses
+          </a>
+        </div>
+      </div>
+    );
+  }
 }

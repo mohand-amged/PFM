@@ -6,29 +6,64 @@ import { EnhancedButton } from '@/components/ui/enhanced-button';
 import { EnhancedInput } from '@/components/ui/enhanced-input';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Plus, Target, DollarSign, Calendar, FileText } from 'lucide-react';
+import { ArrowLeft, Plus, Target, DollarSign, Calendar, FileText, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
-export default async function NewSavingsGoalPage() {
-  const user = await getCurrentUser();
-  
-  if (!user) {
-    redirect('/login');
-  }
-
+// Error fallback component
+function ErrorFallback({ error, resetPath = '/savings' }: { error?: string; resetPath?: string }) {
   return (
     <div className="max-w-2xl mx-auto p-4 sm:p-6">
-      <div className="mb-6 sm:mb-8">
-        <div className="flex items-center gap-4 mb-4">
-          <EnhancedButton variant="outline" size="touch-sm" asChild>
-            <Link href="/savings">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Savings
+      <Card className="p-6 border-red-200 bg-red-50">
+        <div className="text-center space-y-4">
+          <div className="flex justify-center">
+            <AlertCircle className="h-12 w-12 text-red-500" />
+          </div>
+          <h2 className="text-lg font-semibold text-red-900">
+            Unable to Load Create Savings Goal
+          </h2>
+          <p className="text-red-700">
+            {error || 'There was an error loading the create savings goal form. Please try again.'}
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-3">
+            <Link href={resetPath}>
+              <EnhancedButton variant="outline">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Savings
+              </EnhancedButton>
             </Link>
-          </EnhancedButton>
+            <Link href="/savings/new">
+              <EnhancedButton>
+                Try Again
+              </EnhancedButton>
+            </Link>
+          </div>
         </div>
+      </Card>
+    </div>
+  );
+}
+
+export default async function NewSavingsGoalPage() {
+  try {
+    const user = await getCurrentUser();
+    
+    if (!user) {
+      redirect('/login');
+    }
+
+    return (
+      <div className="max-w-2xl mx-auto p-4 sm:p-6">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex items-center gap-4 mb-4">
+            <Link href="/savings">
+              <EnhancedButton variant="outline" size="touch-sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Savings
+              </EnhancedButton>
+            </Link>
+          </div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Create New Savings Goal</h1>
         <p className="text-gray-600 mt-2">Set a new financial goal to track your progress</p>
       </div>
@@ -104,11 +139,11 @@ export default async function NewSavingsGoalPage() {
           </div>
 
           <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
-            <EnhancedButton type="button" variant="outline" size="touch" asChild className="sm:order-1">
-              <Link href="/savings">
+            <Link href="/savings" className="sm:order-1">
+              <EnhancedButton type="button" variant="outline" size="touch" className="w-full">
                 Cancel
-              </Link>
-            </EnhancedButton>
+              </EnhancedButton>
+            </Link>
             <EnhancedButton type="submit" size="touch" className="sm:order-2">
               <Plus className="w-4 h-4 mr-2" />
               Create Goal
@@ -117,5 +152,9 @@ export default async function NewSavingsGoalPage() {
         </form>
       </Card>
     </div>
-  );
+    );
+  } catch (error) {
+    console.error('Error in NewSavingsGoalPage:', error);
+    return <ErrorFallback error={error instanceof Error ? error.message : 'Unknown error occurred'} />;
+  }
 }
