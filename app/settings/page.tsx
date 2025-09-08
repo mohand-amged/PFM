@@ -159,7 +159,8 @@ export default async function SettingsPage() {
                         <option value="KRW">KRW - South Korean Won</option>
                       </select>
                     </div>
-                    <Button type="submit" size="sm">
+                    <Button type="submit" size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                      <Globe className="w-4 h-4 mr-2" />
                       Update Currency
                     </Button>
                   </div>
@@ -176,17 +177,25 @@ export default async function SettingsPage() {
               <div>
                 <h3 className="font-medium text-foreground">Renewal Reminders</h3>
                 <p className="text-sm text-muted-foreground mb-2">Get notified before subscriptions renew</p>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">7 days before</span>
-                    <Switch disabled />
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 border border-muted rounded-lg bg-muted/30">
+                    <span className="text-sm font-medium">7 days before</span>
+                    <div className="flex items-center gap-2">
+                      <Switch disabled className="opacity-50" />
+                      <span className="text-xs text-muted-foreground">Coming Soon</span>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">1 day before</span>
-                    <Switch disabled />
+                  <div className="flex items-center justify-between p-3 border border-muted rounded-lg bg-muted/30">
+                    <span className="text-sm font-medium">1 day before</span>
+                    <div className="flex items-center gap-2">
+                      <Switch disabled className="opacity-50" />
+                      <span className="text-xs text-muted-foreground">Coming Soon</span>
+                    </div>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">Reminder settings will be available in a future update.</p>
+                <p className="text-xs text-muted-foreground mt-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  💡 Email and push notification reminders will be available in the next update.
+                </p>
               </div>
             </div>
           </Card>
@@ -201,17 +210,31 @@ export default async function SettingsPage() {
               <div>
                 <h3 className="font-medium text-foreground">Data Privacy</h3>
                 <p className="text-sm text-muted-foreground mb-2">Control how your data is used and stored</p>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Analytics data collection</span>
-                    <Switch disabled />
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 border border-muted rounded-lg bg-muted/30">
+                    <div className="flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm font-medium">Analytics data collection</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Switch disabled className="opacity-50" defaultChecked={false} />
+                      <span className="text-xs text-muted-foreground">Disabled</span>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Usage statistics</span>
-                    <Switch disabled />
+                  <div className="flex items-center justify-between p-3 border border-muted rounded-lg bg-muted/30">
+                    <div className="flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm font-medium">Usage statistics</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Switch disabled className="opacity-50" defaultChecked={false} />
+                      <span className="text-xs text-muted-foreground">Disabled</span>
+                    </div>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">Privacy settings will be available in a future update.</p>
+                <p className="text-xs text-muted-foreground mt-3 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                  🔒 Your privacy is protected. Analytics and tracking are currently disabled by default.
+                </p>
               </div>
             </div>
           </Card>
@@ -223,24 +246,21 @@ export default async function SettingsPage() {
           <Card className="p-6">
             <h3 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h3>
             <div className="space-y-3">
-              <Button variant="outline" className="w-full justify-start" asChild>
-                <a href="#danger-zone" onClick={(e) => {
-                  e.preventDefault();
-                  document.getElementById('danger-zone')?.scrollIntoView({ behavior: 'smooth' });
-                }}>
-                  <Download className="w-4 h-4 mr-2" />
+              <Button variant="outline" className="w-full justify-start hover:bg-blue-50 dark:hover:bg-blue-900/20" asChild>
+                <a href="#danger-zone">
+                  <Download className="w-4 h-4 mr-2 text-blue-600" />
                   Export Data
                 </a>
               </Button>
-              <Button variant="outline" className="w-full justify-start" asChild>
+              <Button variant="outline" className="w-full justify-start hover:bg-purple-50 dark:hover:bg-purple-900/20" asChild>
                 <Link href="/profile">
-                  <User className="w-4 h-4 mr-2" />
+                  <User className="w-4 h-4 mr-2 text-purple-600" />
                   View Profile
                 </Link>
               </Button>
-              <Button variant="outline" className="w-full justify-start" asChild>
+              <Button variant="outline" className="w-full justify-start hover:bg-green-50 dark:hover:bg-green-900/20" asChild>
                 <Link href="/dashboard">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  <ArrowLeft className="w-4 h-4 mr-2 text-green-600" />
                   Back to Dashboard
                 </Link>
               </Button>
@@ -249,19 +269,47 @@ export default async function SettingsPage() {
 
           {/* Account Info */}
           <Card className="p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Account Info</h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Member since:</span>
-                <span className="text-foreground">Jan 2024</span>
+            <div className="flex items-center space-x-2 mb-4">
+              <User className="w-5 h-5 text-primary" />
+              <h3 className="text-lg font-semibold text-foreground">Account Info</h3>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
+                <span className="text-sm text-muted-foreground flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  Email:
+                </span>
+                <span className="text-sm text-foreground font-medium truncate ml-2">
+                  {user.email}
+                </span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Account type:</span>
-                <span className="text-foreground">Free</span>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
+                <span className="text-sm text-muted-foreground flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  Name:
+                </span>
+                <span className="text-sm text-foreground font-medium">
+                  {user.name || 'Not set'}
+                </span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Status:</span>
-                <span className="text-green-600 font-medium">Active</span>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
+                <span className="text-sm text-muted-foreground flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  Member since:
+                </span>
+                <span className="text-sm text-foreground font-medium">
+                  {new Date(user.createdAt || Date.now()).toLocaleDateString()}
+                </span>
+              </div>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                <span className="text-sm text-muted-foreground flex items-center gap-2">
+                  <Shield className="w-4 h-4" />
+                  Status:
+                </span>
+                <span className="text-sm text-green-700 dark:text-green-400 font-semibold flex items-center gap-1">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  Active
+                </span>
               </div>
             </div>
           </Card>
