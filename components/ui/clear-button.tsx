@@ -132,6 +132,27 @@ export default function ClearButton({
     }
   };
 
+  // Get color-based styles
+  const getButtonStyles = () => {
+    if (className && className.includes('border-')) {
+      // If className already contains custom styling, use it
+      return className;
+    }
+    
+    // Apply default color scheme based on page type
+    const baseStyles = className || '';
+    switch (config.color) {
+      case 'red':
+        return `${baseStyles} border-red-300 text-red-700 hover:bg-red-50 hover:border-red-400 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20 transition-all duration-200`.trim();
+      case 'orange':
+        return `${baseStyles} border-orange-300 text-orange-700 hover:bg-orange-50 hover:border-orange-400 dark:border-orange-600 dark:text-orange-400 dark:hover:bg-orange-900/20 transition-all duration-200`.trim();
+      case 'blue':
+        return `${baseStyles} border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400 dark:border-blue-600 dark:text-blue-400 dark:hover:bg-blue-900/20 transition-all duration-200`.trim();
+      default:
+        return `${baseStyles} hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-all duration-200`.trim();
+    }
+  };
+
   return (
     <div className="relative">
       {message && (
@@ -154,7 +175,7 @@ export default function ClearButton({
           <Button 
             variant={isDestructive ? 'destructive' : variant}
             size={size}
-            className={`${className} ${isDestructive ? '' : 'hover:bg-red-50 hover:text-red-700 hover:border-red-300'}`}
+            className={getButtonStyles()}
             disabled={isClearing}
           >
             {isClearing ? (

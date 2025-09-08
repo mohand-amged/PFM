@@ -94,14 +94,32 @@ export default function DangerZone({ userEmail }: DangerZoneProps) {
     
     try {
       await deleteUserAccount(deleteConfirmation);
-      setMessage({ type: 'success', text: 'Account deleted successfully. Goodbye!' });
-      // The server action will redirect to signup
+      setMessage({ type: 'success', text: 'Account deleted successfully. Redirecting...' });
+      
+      // Clear any local storage/session data
+      if (typeof window !== 'undefined') {
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // Also call logout API to ensure complete session cleanup
+        try {
+          await fetch('/api/auth/logout', { method: 'POST' });
+        } catch (logoutError) {
+          console.error('Error during logout cleanup:', logoutError);
+          // Don't fail the whole operation for this
+        }
+      }
+      
+      // The server action handles redirect, but add fallback
       setTimeout(() => {
         window.location.href = '/signup';
-      }, 1000);
+      }, 2000);
     } catch (error) {
       console.error('Error deleting account:', error);
-      setMessage({ type: 'error', text: 'Failed to delete account. Please try again.' });
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'Failed to delete account. Please try again.';
+      setMessage({ type: 'error', text: errorMessage });
       setIsDeleting(false);
     }
   };
@@ -130,14 +148,16 @@ export default function DangerZone({ userEmail }: DangerZoneProps) {
       
       <div className="space-y-4">
         {/* Export Data */}
-        <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+        <div className="border-2 border-blue-200 dark:border-blue-800/70 rounded-xl p-5 bg-gradient-to-r from-blue-50/80 to-blue-100/50 dark:from-blue-950/30 dark:to-blue-900/20 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <h4 className="font-medium text-foreground flex items-center">
-                <Download className="w-4 h-4 mr-2 text-blue-600" />
+              <h4 className="font-semibold text-blue-900 dark:text-blue-100 flex items-center text-base">
+                <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center mr-3">
+                  <Download className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                </div>
                 Export Your Data
               </h4>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-blue-700/80 dark:text-blue-200/80 mt-2 leading-relaxed">
                 Download all your subscription, financial, and personal data as a JSON file.
                 This includes your wallet, expenses, income, savings, and subscriptions.
               </p>
@@ -147,7 +167,7 @@ export default function DangerZone({ userEmail }: DangerZoneProps) {
               size="sm" 
               onClick={handleExportData}
               disabled={isExporting}
-              className="sm:flex-shrink-0 w-full sm:w-auto"
+              className="sm:flex-shrink-0 w-full sm:w-auto border-blue-300 text-blue-700 hover:bg-blue-100 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/30 font-medium shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50"
             >
               {isExporting ? (
                 <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
@@ -160,14 +180,16 @@ export default function DangerZone({ userEmail }: DangerZoneProps) {
         </div>
 
         {/* Clear All Data */}
-        <div className="border border-orange-200 dark:border-orange-800 rounded-lg p-4 bg-orange-50/30 dark:bg-orange-900/10">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+        <div className="border-2 border-orange-200 dark:border-orange-800/70 rounded-xl p-5 bg-gradient-to-r from-orange-50/80 to-orange-100/50 dark:from-orange-950/30 dark:to-orange-900/20 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <h4 className="font-medium text-foreground flex items-center">
-                <RefreshCw className="w-4 h-4 mr-2 text-orange-600" />
+              <h4 className="font-semibold text-orange-900 dark:text-orange-100 flex items-center text-base">
+                <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/50 rounded-lg flex items-center justify-center mr-3">
+                  <RefreshCw className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                </div>
                 Clear All Data
               </h4>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-orange-700/80 dark:text-orange-200/80 mt-2 leading-relaxed">
                 Remove all your financial data, subscriptions, and reset your wallet.
                 Your account will remain active but all data will be lost permanently.
               </p>
@@ -178,7 +200,7 @@ export default function DangerZone({ userEmail }: DangerZoneProps) {
                   variant="outline" 
                   size="sm"
                   disabled={isClearing}
-                  className="sm:flex-shrink-0 w-full sm:w-auto border-orange-300 text-orange-700 hover:bg-orange-100 dark:border-orange-700 dark:text-orange-400"
+                  className="sm:flex-shrink-0 w-full sm:w-auto border-orange-300 text-orange-700 hover:bg-orange-100 dark:border-orange-700 dark:text-orange-400 dark:hover:bg-orange-900/30 font-medium shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50"
                 >
                   <Shield className="w-4 h-4 mr-2" />
                   Clear Data
@@ -230,17 +252,25 @@ export default function DangerZone({ userEmail }: DangerZoneProps) {
         </div>
 
         {/* Delete Account */}
-        <div className="border border-red-300 dark:border-red-800 rounded-lg p-4 bg-red-50/50 dark:bg-red-900/20">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+        <div className="border-2 border-red-200 dark:border-red-800/70 rounded-xl p-5 bg-gradient-to-r from-red-50/80 to-red-100/50 dark:from-red-950/30 dark:to-red-900/20 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <h4 className="font-medium text-foreground flex items-center">
-                <Trash2 className="w-4 h-4 mr-2 text-red-600" />
+              <h4 className="font-semibold text-red-900 dark:text-red-100 flex items-center text-base">
+                <div className="w-8 h-8 bg-red-100 dark:bg-red-900/50 rounded-lg flex items-center justify-center mr-3">
+                  <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
+                </div>
                 Delete Account Permanently
               </h4>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-red-700/80 dark:text-red-200/80 mt-2 leading-relaxed">
                 Permanently delete your account and all associated data. This action cannot be undone.
                 You will lose access to all your subscriptions, financial data, and settings.
               </p>
+              <div className="mt-3 p-3 bg-red-100/60 dark:bg-red-900/30 rounded-lg border border-red-200/50 dark:border-red-800/50">
+                <p className="text-xs text-red-800 dark:text-red-200 flex items-start">
+                  <AlertTriangle className="w-3 h-3 mr-1 mt-0.5 flex-shrink-0" />
+                  <span><strong>Warning:</strong> This will immediately log you out and delete your account forever.</span>
+                </p>
+              </div>
             </div>
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -248,32 +278,70 @@ export default function DangerZone({ userEmail }: DangerZoneProps) {
                   variant="destructive" 
                   size="sm"
                   disabled={isDeleting}
-                  className="sm:flex-shrink-0 w-full sm:w-auto"
+                  className="sm:flex-shrink-0 w-full sm:w-auto bg-red-600 hover:bg-red-700 border-red-600 hover:border-red-700 font-medium shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Delete Account
+                  {isDeleting ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete Account
+                    </>
+                  )}
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent className="max-w-md">
+              <AlertDialogContent className="max-w-lg">
                 <AlertDialogHeader>
-                  <AlertDialogTitle className="flex items-center">
-                    <AlertTriangle className="w-5 h-5 mr-2 text-red-600" />
+                  <AlertDialogTitle className="flex items-center text-red-600">
+                    <div className="w-8 h-8 bg-red-100 dark:bg-red-900/50 rounded-lg flex items-center justify-center mr-3">
+                      <AlertTriangle className="w-5 h-5" />
+                    </div>
                     Delete Account Permanently?
                   </AlertDialogTitle>
-                  <AlertDialogDescription className="space-y-3">
-                    <p>This will permanently delete your account: <strong>{userEmail}</strong></p>
-                    <p>All of the following will be lost forever:</p>
-                    <ul className="list-disc list-inside text-sm space-y-1 ml-2">
-                      <li>Your account and login access</li>
-                      <li>All subscription tracking data</li>
-                      <li>Complete financial history</li>
-                      <li>Wallet balance and settings</li>
-                      <li>All expenses, income, and savings</li>
-                      <li>Personal preferences and settings</li>
-                    </ul>
-                    <div className="mt-4">
-                      <Label htmlFor="delete-confirmation" className="text-sm font-medium">
-                        Type <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">DELETE MY ACCOUNT</code> to confirm:
+                  <AlertDialogDescription className="space-y-4">
+                    <div className="p-4 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 rounded-lg">
+                      <p className="font-medium text-red-900 dark:text-red-100">This will permanently delete your account:</p>
+                      <p className="text-red-700 dark:text-red-300 font-mono text-sm bg-red-100 dark:bg-red-900/30 px-2 py-1 rounded mt-1">{userEmail}</p>
+                    </div>
+                    
+                    <div>
+                      <p className="font-medium text-foreground mb-2">All of the following will be lost forever:</p>
+                      <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+                        <ul className="grid grid-cols-1 gap-1 text-sm text-muted-foreground">
+                          <li className="flex items-center">
+                            <div className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></div>
+                            Your account and login access
+                          </li>
+                          <li className="flex items-center">
+                            <div className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></div>
+                            All subscription tracking data
+                          </li>
+                          <li className="flex items-center">
+                            <div className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></div>
+                            Complete financial history
+                          </li>
+                          <li className="flex items-center">
+                            <div className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></div>
+                            Wallet balance and settings
+                          </li>
+                          <li className="flex items-center">
+                            <div className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></div>
+                            All expenses, income, and savings
+                          </li>
+                          <li className="flex items-center">
+                            <div className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></div>
+                            Personal preferences and settings
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    
+                    <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                      <Label htmlFor="delete-confirmation" className="text-sm font-semibold text-foreground">
+                        To confirm, type <code className="bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 px-2 py-1 rounded font-mono text-xs">DELETE MY ACCOUNT</code> below:
                       </Label>
                       <Input
                         id="delete-confirmation"
@@ -281,24 +349,27 @@ export default function DangerZone({ userEmail }: DangerZoneProps) {
                         value={deleteConfirmation}
                         onChange={(e) => setDeleteConfirmation(e.target.value)}
                         placeholder="DELETE MY ACCOUNT"
-                        className="mt-2"
+                        className="mt-3 border-red-200 dark:border-red-800 focus:border-red-400 focus:ring-red-200"
                       />
                     </div>
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel onClick={() => setDeleteConfirmation('')}>
+                <AlertDialogFooter className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <AlertDialogCancel 
+                    onClick={() => setDeleteConfirmation('')}
+                    className="font-medium"
+                  >
                     Cancel
                   </AlertDialogCancel>
                   <AlertDialogAction 
                     onClick={handleDeleteAccount}
                     disabled={deleteConfirmation !== 'DELETE MY ACCOUNT' || isDeleting}
-                    className="bg-red-600 hover:bg-red-700"
+                    className="bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-md hover:shadow-lg transition-all duration-200"
                   >
                     {isDeleting ? (
                       <>
                         <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                        Deleting...
+                        Permanently Deleting...
                       </>
                     ) : (
                       <>

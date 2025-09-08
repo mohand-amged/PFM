@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/lib/db';
-import { getCurrentUser } from '@/lib/auth';
+import { getCurrentUser, clearAuthCookie } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
@@ -338,36 +338,75 @@ export async function deleteUserAccount(confirmationText: string) {
   }
 
   console.log('=== ACCOUNT DELETION DEBUG ===');
-  console.log('Deleting account for user:', user.email);
+  console.log('Deleting account for user:', user.email, 'ID:', user.id);
   console.log('==============================');
 
   try {
-    // Delete all user data and account in a transaction
+    // Delete all user data and account in a transaction with explicit ordering
     await db.$transaction(async (prisma) => {
-      // Delete all user-related data
-      await prisma.expense.deleteMany({ where: { userId: user.id } });
-      await prisma.income.deleteMany({ where: { userId: user.id } });
-      await prisma.saving.deleteMany({ where: { userId: user.id } });
-      await prisma.subscription.deleteMany({ where: { userId: user.id } });
-      await prisma.wallet.deleteMany({ where: { userId: user.id } });
+      console.log('Starting transaction for user deletion...');
       
+      // Delete all user-related data in order (foreign key dependencies)
+      const deletedExpenses = await prisma.expense.deleteMany({ where: { userId: user.id } });
+      console.log(`Deleted ${deletedExpenses.count} expenses`);
+      
+      const deletedIncomes = await prisma.income.deleteMany({ where: { userId: user.id } });
+      console.log(`Deleted ${deletedIncomes.count} incomes`);
+      
+      const deletedSavings = await prisma.saving.deleteMany({ where: { userId: user.id } });
+      console.log(`Deleted ${deletedSavings.count} savings`);
+      
+      const deletedSubscriptions = await prisma.subscription.deleteMany({ where: { userId: user.id } });
+      console.log(`Deleted ${deletedSubscriptions.count} subscriptions`);
+      
+      const deletedWallets = await prisma.wallet.deleteMany({ where: { userId: user.id } });
+      console.log(`Deleted ${deletedWallets.count} wallets`);
+      
+      // Try to delete user settings if the table exists
       try {
-        await prisma.userSettings.deleteMany({ where: { userId: user.id } });
-      } catch (error) {
-        // Ignore if table doesn't exist
+        const deletedSettings = await prisma.userSettings.deleteMany({ where: { userId: user.id } });
+        console.log(`Deleted ${deletedSettings.count} user settings`);
+      } catch (settingsError) {
+        console.log('UserSettings table might not exist, skipping...', settingsError);
       }
 
       // Finally delete the user account
+      console.log('Deleting user account...');
       await prisma.user.delete({ where: { id: user.id } });
+      console.log('User account deleted successfully');
+    }, {
+      timeout: 10000, // 10 second timeout
+      maxWait: 5000,  // 5 second max wait
     });
 
-    console.log('Account deleted successfully');
+    console.log('Account deletion transaction completed successfully');
     
   } catch (error) {
     console.error('Error deleting account:', error);
-    throw error;
+    
+    // Provide more specific error messages
+    if (error instanceof Error) {
+      if (error.message.includes('Foreign key constraint')) {
+        throw new Error('Unable to delete account due to data dependencies. Please contact support.');
+      } else if (error.message.includes('timeout')) {
+        throw new Error('Account deletion timed out. Please try again or contact support.');
+      } else {
+        throw new Error(`Account deletion failed: ${error.message}`);
+      }
+    } else {
+      throw new Error('An unexpected error occurred while deleting the account. Please contact support.');
+    }
   }
 
+  // Clear the auth cookie since the account no longer exists
+  try {
+    await clearAuthCookie();
+    console.log('Auth cookie cleared successfully');
+  } catch (cookieError) {
+    console.error('Error clearing auth cookie:', cookieError);
+    // Don't throw here, account is already deleted
+  }
+  
   // Redirect to signup page since account is deleted
   redirect('/signup');
 }
