@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import SavingsHeader from '@/components/SavingsHeader';
 import { Trash2, Edit, Plus, Calendar, DollarSign, Target, Play, Pause } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -69,18 +70,7 @@ export default async function SavingsPage() {
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6">
       <div className="mb-6 sm:mb-8">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Savings</h1>
-            <p className="text-gray-600 mt-2">Track your saving goals and build financial security</p>
-          </div>
-          <Link href="/savings/new">
-            <Button className="w-full sm:w-auto">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Saving Goal
-            </Button>
-          </Link>
-        </div>
+        <SavingsHeader />
       </div>
 
       {/* Quick Stats */}

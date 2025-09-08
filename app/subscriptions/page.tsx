@@ -6,6 +6,7 @@ import { deleteSubscription } from '@/app/actions/subscription';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import SubscriptionsHeader from '@/components/SubscriptionsHeader';
 import { Trash2, Edit, Plus, Calendar, DollarSign } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -59,18 +60,7 @@ export default async function SubscriptionsPage() {
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6">
       <div className="mb-6 sm:mb-8">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Subscriptions</h1>
-            <p className="text-gray-600 mt-2">Manage all your recurring subscriptions in one place</p>
-          </div>
-          <Link href="/subscriptions/new">
-            <Button className="w-full sm:w-auto">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Subscription
-            </Button>
-          </Link>
-        </div>
+        <SubscriptionsHeader />
       </div>
 
       {/* Quick Stats */}

@@ -5,7 +5,9 @@ import Link from 'next/link';
 import { EnhancedButton } from '@/components/ui/enhanced-button';
 import { Card } from '@/components/ui/card';
 import { DeleteConfirmDialog } from '@/components/ui/confirm-dialog';
+import ClearButton from '@/components/ui/clear-button';
 import { deleteIncome } from '@/app/actions/wallet';
+import { clearIncomeHistory } from '@/app/actions/clear-data';
 import { 
   ArrowLeft,
   Plus, 
@@ -143,12 +145,24 @@ export default function IncomeManagementClient({ stats, incomes, wallet }: Incom
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Income Management</h1>
             <p className="text-gray-600 dark:text-gray-400 mt-2">Manage all your income sources and track your earnings</p>
           </div>
-          <Link href="/wallet/add-income">
-            <EnhancedButton size="touch">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Income
-            </EnhancedButton>
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link href="/wallet/add-income">
+              <EnhancedButton size="touch" className="w-full sm:w-auto">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Income
+              </EnhancedButton>
+            </Link>
+            <ClearButton 
+              pageType="income" 
+              onClear={async () => {
+                await clearIncomeHistory();
+                window.location.reload();
+              }}
+              size="touch"
+              variant="outline"
+              className="w-full sm:w-auto"
+            />
+          </div>
         </div>
       </div>
 

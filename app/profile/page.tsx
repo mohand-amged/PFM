@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import ProfileActions from '@/components/ProfileActions';
 import { User, Mail, Calendar, Shield, Settings, TrendingUp, Target, CreditCard, PiggyBank, Receipt, BarChart3 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -230,23 +231,7 @@ export default async function ProfilePage() {
 
           <Card className="p-6">
             <h3 className="text-lg font-bold text-foreground mb-4">Quick Actions</h3>
-            <div className="space-y-2">
-              <Button className="w-full" asChild>
-                <Link href="/dashboard">
-                  View Dashboard
-                </Link>
-              </Button>
-              <Button variant="outline" className="w-full" asChild>
-                <Link href="/analytics">
-                  Analytics
-                </Link>
-              </Button>
-              <Button variant="outline" className="w-full" asChild>
-                <Link href="/settings">
-                  Settings
-                </Link>
-              </Button>
-            </div>
+            <ProfileActions />
           </Card>
 
           {savingStats.activeSavings.length > 0 && (

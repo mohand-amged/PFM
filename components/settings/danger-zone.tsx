@@ -131,8 +131,8 @@ export default function DangerZone({ userEmail }: DangerZoneProps) {
       <div className="space-y-4">
         {/* Export Data */}
         <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+            <div className="flex-1 min-w-0">
               <h4 className="font-medium text-foreground flex items-center">
                 <Download className="w-4 h-4 mr-2 text-blue-600" />
                 Export Your Data
@@ -147,7 +147,7 @@ export default function DangerZone({ userEmail }: DangerZoneProps) {
               size="sm" 
               onClick={handleExportData}
               disabled={isExporting}
-              className="ml-4 flex-shrink-0"
+              className="sm:flex-shrink-0 w-full sm:w-auto"
             >
               {isExporting ? (
                 <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
@@ -161,8 +161,8 @@ export default function DangerZone({ userEmail }: DangerZoneProps) {
 
         {/* Clear All Data */}
         <div className="border border-orange-200 dark:border-orange-800 rounded-lg p-4 bg-orange-50/30 dark:bg-orange-900/10">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+            <div className="flex-1 min-w-0">
               <h4 className="font-medium text-foreground flex items-center">
                 <RefreshCw className="w-4 h-4 mr-2 text-orange-600" />
                 Clear All Data
@@ -178,7 +178,7 @@ export default function DangerZone({ userEmail }: DangerZoneProps) {
                   variant="outline" 
                   size="sm"
                   disabled={isClearing}
-                  className="ml-4 flex-shrink-0 border-orange-300 text-orange-700 hover:bg-orange-100 dark:border-orange-700 dark:text-orange-400"
+                  className="sm:flex-shrink-0 w-full sm:w-auto border-orange-300 text-orange-700 hover:bg-orange-100 dark:border-orange-700 dark:text-orange-400"
                 >
                   <Shield className="w-4 h-4 mr-2" />
                   Clear Data
@@ -231,8 +231,8 @@ export default function DangerZone({ userEmail }: DangerZoneProps) {
 
         {/* Delete Account */}
         <div className="border border-red-300 dark:border-red-800 rounded-lg p-4 bg-red-50/50 dark:bg-red-900/20">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+            <div className="flex-1 min-w-0">
               <h4 className="font-medium text-foreground flex items-center">
                 <Trash2 className="w-4 h-4 mr-2 text-red-600" />
                 Delete Account Permanently
@@ -248,7 +248,7 @@ export default function DangerZone({ userEmail }: DangerZoneProps) {
                   variant="destructive" 
                   size="sm"
                   disabled={isDeleting}
-                  className="ml-4 flex-shrink-0"
+                  className="sm:flex-shrink-0 w-full sm:w-auto"
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
                   Delete Account

@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import NotificationsHeader from '@/components/NotificationsHeader';
 import { 
   Bell, 
   CheckCircle, 
@@ -74,24 +75,7 @@ export default async function NotificationsPage() {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="mb-8">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Notifications</h1>
-            <p className="text-gray-600 mt-2">
-              Stay updated with your financial activities and alerts
-            </p>
-          </div>
-          <div className="flex gap-3">
-            {stats.unread > 0 && (
-              <form action={markAllNotificationsRead}>
-                <Button variant="outline" type="submit">
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  Mark All Read ({stats.unread})
-                </Button>
-              </form>
-            )}
-          </div>
-        </div>
+        <NotificationsHeader unreadCount={stats.unread} />
       </div>
 
       {/* Stats Cards */}

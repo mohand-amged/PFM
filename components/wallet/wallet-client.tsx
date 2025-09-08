@@ -7,7 +7,9 @@ import { EnhancedButton } from '@/components/ui/enhanced-button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { DeleteConfirmDialog } from '@/components/ui/confirm-dialog';
+import ClearButton from '@/components/ui/clear-button';
 import { deleteIncome } from '@/app/actions/wallet';
+import { clearWalletHistory } from '@/app/actions/clear-data';
 import { 
   Wallet, 
   Plus, 
@@ -130,6 +132,16 @@ export default function WalletClient({ stats, incomes, wallet }: WalletClientPro
                 Wallet Settings
               </EnhancedButton>
             </Link>
+            <ClearButton 
+              pageType="wallet" 
+              onClear={async () => {
+                await clearWalletHistory();
+                window.location.reload();
+              }}
+              size="touch"
+              variant="outline"
+              className="w-full sm:w-auto"
+            />
           </div>
         </div>
       </div>

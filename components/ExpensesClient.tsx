@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { deleteExpenseById } from '@/app/actions/expenses';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import ClearButton from '@/components/ui/clear-button';
+import { clearExpenses } from '@/app/actions/clear-data';
 import { Trash2, Edit, Calendar, DollarSign, Receipt, Plus } from 'lucide-react';
 import Link from 'next/link';
 
@@ -77,12 +79,23 @@ export default function ExpensesClient({
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Expenses</h1>
             <p className="text-gray-600 mt-2">Track and manage your expenses</p>
           </div>
-          <Link href="/expenses/new">
-            <Button className="w-full sm:w-auto">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Expense
-            </Button>
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link href="/expenses/new">
+              <Button className="w-full sm:w-auto">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Expense
+              </Button>
+            </Link>
+            <ClearButton 
+              pageType="expenses" 
+              onClear={async () => {
+                await clearExpenses();
+                window.location.reload();
+              }}
+              size="default"
+              className="w-full sm:w-auto"
+            />
+          </div>
         </div>
       </div>
 
