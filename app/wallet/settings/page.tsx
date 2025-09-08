@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { EnhancedButton } from '@/components/ui/enhanced-button';
 import { EnhancedInput } from '@/components/ui/enhanced-input';
 import { Card } from '@/components/ui/card';
-import { ArrowLeft, Settings, AlertTriangle, DollarSign, Target, Coins } from 'lucide-react';
+import { ArrowLeft, Settings, AlertTriangle, DollarSign, Target } from 'lucide-react';
+import CurrencySelect from '@/components/ui/currency-select';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
@@ -71,28 +72,15 @@ export default async function WalletSettingsPage() {
               helperText="Set your monthly spending limit. You'll get alerts when you're close to exceeding it."
             />
 
-            <div>
-              <label htmlFor="currency" className="block text-sm font-medium text-gray-700 mb-2">
-                Currency
-              </label>
-              <div className="relative">
-                <Coins className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <select
-                  id="currency"
-                  name="currency"
-                  className="pl-10 block w-full rounded-xl border border-input bg-background px-4 py-3 text-base ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  defaultValue={wallet?.currency || 'USD'}
-                >
-                  <option value="USD">USD - US Dollar</option>
-                  <option value="EUR">EUR - Euro</option>
-                  <option value="GBP">GBP - British Pound</option>
-                  <option value="CAD">CAD - Canadian Dollar</option>
-                  <option value="AUD">AUD - Australian Dollar</option>
-                  <option value="JPY">JPY - Japanese Yen</option>
-                </select>
-              </div>
-              <p className="text-sm text-gray-600 mt-1">Choose your preferred currency for display</p>
-            </div>
+            <CurrencySelect
+              id="currency"
+              name="currency"
+              label="Currency"
+              defaultValue={wallet?.currency || 'USD'}
+              helperText="Choose your preferred currency for display"
+              size="touch"
+              required={false}
+            />
 
             <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
               <Link href="/wallet" className="sm:order-1">

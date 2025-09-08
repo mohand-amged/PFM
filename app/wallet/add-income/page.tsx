@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Plus, DollarSign, Calendar, FileText } from 'lucide-react';
 import Link from 'next/link';
+import CurrencySelect from '@/components/ui/currency-select';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,7 +48,7 @@ export default async function AddIncomePage() {
             helperText="Enter a descriptive name for this income source"
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <EnhancedInput
               id="amount"
               name="amount"
@@ -60,6 +61,16 @@ export default async function AddIncomePage() {
               placeholder="0.00"
               leftIcon={<DollarSign className="w-4 h-4" />}
               helperText="Enter the income amount"
+            />
+
+            <CurrencySelect
+              id="currency"
+              name="currency"
+              label="Currency"
+              defaultValue="USD"
+              helperText="Select the currency for this income"
+              size="touch"
+              required={true}
             />
 
             <EnhancedInput
