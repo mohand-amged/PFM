@@ -1,11 +1,13 @@
 import { getCurrentUser } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import { getWallet, updateWallet } from '@/app/actions/wallet';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { ThemeRadioGroup } from '@/components/theme-toggle';
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
+import DangerZone from '@/components/settings/danger-zone';
 import { 
   Palette, 
   Bell, 
@@ -28,6 +30,8 @@ export default async function SettingsPage() {
   if (!user) {
     redirect('/login');
   }
+
+  const wallet = await getWallet();
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -118,13 +122,53 @@ export default async function SettingsPage() {
             </div>
             <div className="space-y-4">
               <div>
-                <h3 className="font-medium text-foreground">Default Currency</h3>
-                <p className="text-sm text-muted-foreground mb-2">Currently set to USD</p>
-                <Button variant="outline" size="sm" disabled>
-                  <Globe className="w-4 h-4 mr-2" />
-                  Change Currency
-                </Button>
-                <p className="text-xs text-muted-foreground mt-2">Multi-currency support coming soon.</p>
+                <h3 className="font-medium text-foreground mb-2">Default Currency</h3>
+                <p className="text-sm text-muted-foreground mb-4">Currently set to {wallet?.currency || 'USD'} - Choose your preferred currency for all financial displays</p>
+                
+                <form action={updateWallet} className="space-y-3">
+                  <input type="hidden" name="balance" value={wallet?.balance || 0} />
+                  <input type="hidden" name="monthlyBudget" value={wallet?.monthlyBudget || 0} />
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="relative flex-1">
+                      <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <select
+                        name="currency"
+                        defaultValue={wallet?.currency || 'USD'}
+                        className="pl-10 block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      >
+                        <option value="USD">USD - US Dollar</option>
+                        <option value="EUR">EUR - Euro</option>
+                        <option value="GBP">GBP - British Pound</option>
+                        <option value="EGP">EGP - Egyptian Pound 🇪🇬</option>
+                        <option value="CAD">CAD - Canadian Dollar</option>
+                        <option value="AUD">AUD - Australian Dollar</option>
+                        <option value="JPY">JPY - Japanese Yen</option>
+                        <option value="CHF">CHF - Swiss Franc</option>
+                        <option value="CNY">CNY - Chinese Yuan</option>
+                        <option value="INR">INR - Indian Rupee</option>
+                        <option value="BRL">BRL - Brazilian Real</option>
+                        <option value="MXN">MXN - Mexican Peso</option>
+                        <option value="ZAR">ZAR - South African Rand</option>
+                        <option value="SGD">SGD - Singapore Dollar</option>
+                        <option value="HKD">HKD - Hong Kong Dollar</option>
+                        <option value="SAR">SAR - Saudi Riyal</option>
+                        <option value="AED">AED - UAE Dirham</option>
+                        <option value="TRY">TRY - Turkish Lira</option>
+                        <option value="RUB">RUB - Russian Ruble</option>
+                        <option value="KRW">KRW - South Korean Won</option>
+                      </select>
+                    </div>
+                    <Button type="submit" size="sm">
+                      Update Currency
+                    </Button>
+                  </div>
+                </form>
+                
+                <p className="text-xs text-muted-foreground mt-2">
+                  ✅ Egyptian Pound and {wallet?.currency === 'EGP' ? '19 other' : '20'} currencies supported! 
+                  This will update your wallet currency as well.
+                </p>
               </div>
               
               <Separator />
@@ -179,9 +223,14 @@ export default async function SettingsPage() {
           <Card className="p-6">
             <h3 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h3>
             <div className="space-y-3">
-              <Button variant="outline" className="w-full justify-start" disabled>
-                <Download className="w-4 h-4 mr-2" />
-                Export Data
+              <Button variant="outline" className="w-full justify-start" asChild>
+                <a href="#danger-zone" onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('danger-zone')?.scrollIntoView({ behavior: 'smooth' });
+                }}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Export Data
+                </a>
               </Button>
               <Button variant="outline" className="w-full justify-start" asChild>
                 <Link href="/profile">
@@ -218,20 +267,9 @@ export default async function SettingsPage() {
           </Card>
 
           {/* Danger Zone */}
-          <Card className="p-6 border-red-200 dark:border-red-900">
-            <h3 className="text-lg font-semibold text-red-600 mb-4">Danger Zone</h3>
-            <div className="space-y-3">
-              <div>
-                <h4 className="font-medium text-foreground">Delete Account</h4>
-                <p className="text-sm text-muted-foreground mb-3">Permanently delete your account and all associated data. This action cannot be undone.</p>
-                <Button variant="destructive" size="sm" disabled>
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Delete Account
-                </Button>
-                <p className="text-xs text-muted-foreground mt-2">Account deletion will be available in a future update.</p>
-              </div>
-            </div>
-          </Card>
+          <div id="danger-zone">
+            <DangerZone userEmail={user.email} />
+          </div>
         </div>
       </div>
     </div>

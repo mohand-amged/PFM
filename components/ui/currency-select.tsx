@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { getCurrencyOptions } from '@/lib/currencies';
 import { Coins } from 'lucide-react';

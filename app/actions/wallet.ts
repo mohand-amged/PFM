@@ -53,7 +53,7 @@ export async function getWallet() {
   }
 }
 
-// Update wallet balance and budget
+// Update wallet balance and budget - Simple version that always redirects
 export async function updateWallet(formData: FormData) {
   const user = await getCurrentUser();
   
@@ -65,11 +65,18 @@ export async function updateWallet(formData: FormData) {
   const monthlyBudgetRaw = String(formData.get('monthlyBudget') || '');
   const currency = String(formData.get('currency') || 'USD');
 
+  console.log('=== WALLET UPDATE DEBUG ===');
+  console.log('Balance:', balanceRaw);
+  console.log('Monthly Budget:', monthlyBudgetRaw);
+  console.log('Currency:', currency);
+  console.log('User ID:', user.id);
+  console.log('=========================');
+
   const balance = parseFloat(balanceRaw) || 0;
   const monthlyBudget = parseFloat(monthlyBudgetRaw) || 0;
 
   try {
-    await db.wallet.upsert({
+    const updatedWallet = await db.wallet.upsert({
       where: { userId: user.id },
       create: {
         userId: user.id,
@@ -84,7 +91,11 @@ export async function updateWallet(formData: FormData) {
       },
     });
 
+    console.log('Wallet updated successfully:', updatedWallet);
+
     revalidatePath('/wallet');
+    revalidatePath('/wallet/settings');
+    revalidatePath('/wallet/settings-test');
     revalidatePath('/dashboard');
     
   } catch (error) {
@@ -92,6 +103,7 @@ export async function updateWallet(formData: FormData) {
     throw error;
   }
 
+  // Always redirect to wallet page after successful update
   redirect('/wallet');
 }
 
