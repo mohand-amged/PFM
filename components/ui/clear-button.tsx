@@ -55,12 +55,12 @@ const PAGE_CONFIG = {
     color: 'red',
   },
   wallet: {
-    title: 'Reset Wallet Data',
-    description: 'This will clear your wallet transaction history but keep your current balance.',
-    items: ['Income history', 'Transaction records', 'Financial statistics', 'Budget history'],
-    warning: 'Your current balance and currency settings will be preserved.',
-    buttonText: 'Clear Wallet History',
-    color: 'orange',
+    title: 'Clear Wallet Balance',
+    description: 'This will reset your wallet balance to zero but keep your settings and transaction history.',
+    items: ['Current wallet balance', 'Balance display'],
+    warning: 'Your currency settings, budget, and transaction history will be preserved.',
+    buttonText: 'Clear Balance',
+    color: 'red',
   },
   income: {
     title: 'Clear Income History',

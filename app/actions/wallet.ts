@@ -95,7 +95,6 @@ export async function updateWallet(formData: FormData) {
 
     revalidatePath('/wallet');
     revalidatePath('/wallet/settings');
-    revalidatePath('/wallet/settings-test');
     revalidatePath('/dashboard');
     
   } catch (error) {
@@ -303,6 +302,38 @@ export async function deleteIncome(formData: FormData) {
     
   } catch (error) {
     console.error('Error deleting income:', error);
+    throw error;
+  }
+
+  redirect('/wallet');
+}
+
+// Clear wallet balance (reset to 0)
+export async function clearWalletBalance() {
+  const user = await getCurrentUser();
+  
+  if (!user) {
+    redirect('/login');
+  }
+
+  try {
+    // Reset wallet balance to 0 but keep other settings
+    await db.wallet.updateMany({
+      where: { userId: user.id },
+      data: {
+        balance: 0,
+      },
+    });
+
+    console.log('Wallet balance cleared successfully');
+
+    revalidatePath('/wallet');
+    revalidatePath('/wallet/settings');
+    revalidatePath('/dashboard');
+    revalidatePath('/analytics');
+    
+  } catch (error) {
+    console.error('Error clearing wallet balance:', error);
     throw error;
   }
 

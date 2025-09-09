@@ -169,7 +169,6 @@ export default async function WalletSettingsPage() {
               <p>Current currency: <code className="bg-gray-200 px-1 rounded">{wallet?.currency || 'Not set'}</code></p>
               <p>Current balance: <code className="bg-gray-200 px-1 rounded">{wallet?.balance || 0}</code></p>
               <p>Monthly budget: <code className="bg-gray-200 px-1 rounded">{wallet?.monthlyBudget || 0}</code></p>
-              <p className="text-xs text-blue-600 mt-2">💡 If currency change isn&apos;t working, try the <Link href="/wallet/settings-test" className="underline">test page</Link></p>
             </div>
           </Card>
         </div>

@@ -4,21 +4,8 @@ export const SUPPORTED_CURRENCIES = [
   { code: 'GBP', name: 'British Pound', symbol: '£' },
   { code: 'EGP', name: 'Egyptian Pound', symbol: 'E£' },
   { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$' },
-  { code: 'AUD', name: 'Australian Dollar', symbol: 'A$' },
-  { code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
-  { code: 'CHF', name: 'Swiss Franc', symbol: 'CHF' },
-  { code: 'CNY', name: 'Chinese Yuan', symbol: '¥' },
-  { code: 'INR', name: 'Indian Rupee', symbol: '₹' },
-  { code: 'BRL', name: 'Brazilian Real', symbol: 'R$' },
-  { code: 'MXN', name: 'Mexican Peso', symbol: '$' },
-  { code: 'ZAR', name: 'South African Rand', symbol: 'R' },
-  { code: 'SGD', name: 'Singapore Dollar', symbol: 'S$' },
-  { code: 'HKD', name: 'Hong Kong Dollar', symbol: 'HK$' },
   { code: 'SAR', name: 'Saudi Riyal', symbol: 'SR' },
   { code: 'AED', name: 'UAE Dirham', symbol: 'AED' },
-  { code: 'TRY', name: 'Turkish Lira', symbol: '₺' },
-  { code: 'RUB', name: 'Russian Ruble', symbol: '₽' },
-  { code: 'KRW', name: 'South Korean Won', symbol: '₩' },
 ] as const;
 
 export type CurrencyCode = typeof SUPPORTED_CURRENCIES[number]['code'];
@@ -60,7 +47,7 @@ export function formatCurrency(amount: number, currencyCode: string = 'USD', loc
 
 /**
  * Common currency groups for easier selection
- */
+*/
 export const CURRENCY_GROUPS = {
   MAJOR: ['USD', 'EUR', 'GBP', 'JPY'],
   MIDDLE_EAST_AFRICA: ['EGP', 'SAR', 'AED', 'ZAR'],

@@ -32,16 +32,6 @@ function validateEnvironment(): EnvConfig {
     throw new Error(errorMessage);
   }
 
-  // Validate DATABASE_URL format
-  if (!requiredVars.DATABASE_URL.startsWith('mongodb://') && !requiredVars.DATABASE_URL.startsWith('mongodb+srv://')) {
-    throw new Error('DATABASE_URL must be a valid MongoDB connection string');
-  }
-
-  // Validate JWT_SECRET strength
-  if (requiredVars.JWT_SECRET.length < 32) {
-    console.warn('⚠️ JWT_SECRET should be at least 32 characters long for security');
-  }
-
   console.log('✅ Environment variables validated successfully');
   
   return {

@@ -93,6 +93,40 @@ export async function clearSavings() {
   }
 }
 
+// Clear wallet balance (reset to 0)
+export async function clearWalletBalance() {
+  const user = await getCurrentUser();
+  
+  if (!user) {
+    redirect('/login');
+  }
+
+  console.log('=== CLEARING WALLET BALANCE ===');
+  console.log('User ID:', user.id);
+
+  try {
+    // Reset wallet balance to 0 but keep other settings
+    const result = await db.wallet.updateMany({
+      where: { userId: user.id },
+      data: {
+        balance: 0,
+      },
+    });
+
+    console.log('Wallet balance cleared successfully');
+
+    revalidatePath('/wallet');
+    revalidatePath('/wallet/settings');
+    revalidatePath('/dashboard');
+    revalidatePath('/analytics');
+    
+    return { success: true, cleared: true };
+  } catch (error) {
+    console.error('Error clearing wallet balance:', error);
+    throw new Error('Failed to clear wallet balance');
+  }
+}
+
 // Clear wallet transaction history (keep balance and settings)
 export async function clearWalletHistory() {
   const user = await getCurrentUser();
@@ -225,7 +259,7 @@ export async function clearPageData(pageType: string) {
     case 'savings':
       return await clearSavings();
     case 'wallet':
-      return await clearWalletHistory();
+      return await clearWalletBalance();
     case 'income':
       return await clearIncomeHistory();
     case 'profile':
