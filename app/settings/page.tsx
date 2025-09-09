@@ -1,6 +1,8 @@
 import { getCurrentUser } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { getWallet, updateWallet } from '@/app/actions/wallet';
+import { getUserPreferences } from '@/app/actions/preferences';
+import db from '@/lib/db';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -8,6 +10,8 @@ import { ThemeRadioGroup } from '@/components/theme-toggle';
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
 import DangerZone from '@/components/settings/danger-zone';
+import PreferenceToggle from '@/components/settings/PreferenceToggle';
+import SettingsClient from '@/components/settings/SettingsClient';
 import { 
   Palette, 
   Bell, 
@@ -19,19 +23,41 @@ import {
   User, 
   ArrowLeft,
   Mail,
-  Clock
+  Clock,
+  Database,
+  Settings as SettingsIcon
 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ExportData from '@/components/data/ExportData';
+import ImportData from '@/components/data/ImportData';
 
 export const dynamic = 'force-dynamic';
 
 export default async function SettingsPage() {
-  const user = await getCurrentUser();
+  const authUser = await getCurrentUser();
   
-  if (!user) {
+  if (!authUser) {
     redirect('/login');
   }
 
-  const wallet = await getWallet();
+  // Get full user data from database including createdAt
+  const [user, wallet, preferences] = await Promise.all([
+    db.user.findUnique({
+      where: { id: authUser.id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+      },
+    }),
+    getWallet(),
+    getUserPreferences()
+  ]);
+
+  if (!user) {
+    redirect('/login');
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -48,9 +74,27 @@ export default async function SettingsPage() {
         <p className="text-muted-foreground mt-2">Manage your application preferences and account settings</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Settings */}
-        <div className="lg:col-span-2 space-y-6">
+      {/* Tabs for different settings sections */}
+      <Tabs defaultValue="general" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="general" className="flex items-center gap-2">
+            <SettingsIcon size={16} />
+            General
+          </TabsTrigger>
+          <TabsTrigger value="data" className="flex items-center gap-2">
+            <Database size={16} />
+            Data Management
+          </TabsTrigger>
+          <TabsTrigger value="profile" className="flex items-center gap-2">
+            <User size={16} />
+            Profile & Security
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="general" className="mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Main Settings */}
+            <div className="lg:col-span-2 space-y-6">
           {/* Appearance Settings */}
           <Card className="p-6">
             <div className="flex items-center space-x-2 mb-4">
@@ -87,32 +131,11 @@ export default async function SettingsPage() {
                 </div>
                 <p className="text-sm text-muted-foreground mt-2">Profile editing functionality will be available soon.</p>
               </div>
-
-              <Separator />
-
-              <div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium text-foreground">Email Notifications</h3>
-                    <p className="text-sm text-muted-foreground">Receive emails about subscription renewals</p>
-                  </div>
-                  <Switch disabled />
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">Email notifications will be available in a future update.</p>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium text-foreground">Push Notifications</h3>
-                    <p className="text-sm text-muted-foreground">Get notified about upcoming renewals</p>
-                  </div>
-                  <Switch disabled />
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">Push notifications will be available in a future update.</p>
-              </div>
             </div>
           </Card>
+          
+          {/* Notifications Settings */}
+          <SettingsClient preferences={preferences} />
 
           {/* Financial Settings */}
           <Card className="p-6">
@@ -169,32 +192,6 @@ export default async function SettingsPage() {
                 <p className="text-xs text-muted-foreground mt-2">
                   ✅ Egyptian Pound and {wallet?.currency === 'EGP' ? '19 other' : '20'} currencies supported! 
                   This will update your wallet currency as well.
-                </p>
-              </div>
-              
-              <Separator />
-              
-              <div>
-                <h3 className="font-medium text-foreground">Renewal Reminders</h3>
-                <p className="text-sm text-muted-foreground mb-2">Get notified before subscriptions renew</p>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 border border-muted rounded-lg bg-muted/30">
-                    <span className="text-sm font-medium">7 days before</span>
-                    <div className="flex items-center gap-2">
-                      <Switch disabled className="opacity-50" />
-                      <span className="text-xs text-muted-foreground">Coming Soon</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between p-3 border border-muted rounded-lg bg-muted/30">
-                    <span className="text-sm font-medium">1 day before</span>
-                    <div className="flex items-center gap-2">
-                      <Switch disabled className="opacity-50" />
-                      <span className="text-xs text-muted-foreground">Coming Soon</span>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-xs text-muted-foreground mt-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                  💡 Email and push notification reminders will be available in the next update.
                 </p>
               </div>
             </div>
@@ -298,7 +295,14 @@ export default async function SettingsPage() {
                   Member since:
                 </span>
                 <span className="text-sm text-foreground font-medium">
-                  {new Date(user.createdAt || Date.now()).toLocaleDateString()}
+                  {user.createdAt 
+                    ? new Date(user.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })
+                    : 'Date not available'
+                  }
                 </span>
               </div>
               <div className="flex items-center justify-between p-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
@@ -320,6 +324,36 @@ export default async function SettingsPage() {
           </div>
         </div>
       </div>
+    </TabsContent>
+
+    <TabsContent value="data" className="mt-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <ExportData />
+        <ImportData />
+      </div>
+    </TabsContent>
+
+    <TabsContent value="profile" className="mt-6">
+      <div className="max-w-2xl mx-auto">
+        <Card className="p-6">
+          <div className="flex items-center space-x-2 mb-4">
+            <User className="w-5 h-5 text-primary" />
+            <h2 className="text-xl font-semibold text-foreground">Profile & Security</h2>
+          </div>
+          <div className="text-center p-8">
+            <User size={48} className="mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Profile Management Coming Soon</h3>
+            <p className="text-muted-foreground">
+              Advanced profile editing and security settings will be available here.
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              For now, basic account information is shown in the General tab.
+            </p>
+          </div>
+        </Card>
+      </div>
+    </TabsContent>
+  </Tabs>
     </div>
   );
 }

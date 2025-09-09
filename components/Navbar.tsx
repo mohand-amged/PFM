@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { User, Settings, LogOut, Menu, X, Wallet, Bell, TrendingUp, CreditCard, PiggyBank, BarChart3 } from 'lucide-react';
+import { User, Settings, LogOut, Menu, X, Home, CreditCard, Target, Settings as SettingsIcon, Bell, Palette, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import NotificationBell from '@/components/NotificationBell';
 import NotificationPanel from '@/components/NotificationPanel';
@@ -13,6 +13,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { EnhancedThemeToggle, CompactThemeToggle } from '@/components/EnhancedThemeToggle';
 
 interface User {
   id: string;
@@ -80,12 +81,10 @@ export default function Navbar({ user }: NavbarProps) {
   };
 
   const navLinks = [
-    { href: '/dashboard', label: 'Dashboard', icon: TrendingUp },
-    { href: '/wallet', label: 'Wallet', icon: Wallet },
-    { href: '/expenses', label: 'Expenses', icon: CreditCard },
-    { href: '/subscriptions', label: 'Subscriptions', icon: Bell },
-    { href: '/savings', label: 'Savings', icon: PiggyBank },
-    { href: '/analytics', label: 'Analytics', icon: BarChart3 },
+    { href: '/dashboard', label: 'Dashboard', icon: Home },
+    { href: '/transactions', label: 'Transactions', icon: CreditCard },
+    { href: '/budgets', label: 'Budgets', icon: Target },
+    { href: '/settings', label: 'Settings', icon: SettingsIcon },
   ];
 
   const ProfileMenu = () => (
@@ -223,9 +222,14 @@ export default function Navbar({ user }: NavbarProps) {
             {/* Theme Toggle */}
             <div className="px-4 py-3">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium text-foreground">Appearance</span>
+                <span className="text-sm font-medium text-foreground flex items-center gap-2">
+                  <Palette className="w-4 h-4" />
+                  Appearance
+                </span>
               </div>
-              <ThemeToggle />
+              <div className="px-2">
+                <CompactThemeToggle />
+              </div>
             </div>
           </div>
           
@@ -265,67 +269,73 @@ export default function Navbar({ user }: NavbarProps) {
   }
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm border-b border-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div className="flex-shrink-0">
-            <Link href="/dashboard" className="flex items-center space-x-2 group">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/70 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-                <TrendingUp className="w-4 h-4 text-primary-foreground" />
+    <>
+      <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo */}
+            <div className="flex-shrink-0">
+              <Link href="/dashboard" className="flex items-center space-x-2 group">
+                <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/70 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <TrendingUp className="w-4 h-4 text-primary-foreground" />
+                </div>
+                <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                  FinanceTracker
+                </span>
+              </Link>
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center space-x-1">
+              {navLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      pathname === link.href
+                        ? 'bg-primary/10 text-primary border border-primary/20'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span>{link.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* User Profile / Mobile Menu */}
+            <div className="flex items-center space-x-2">
+              {/* Theme Toggle - Always visible on desktop */}
+              <div className="hidden md:block">
+                <EnhancedThemeToggle />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                FinanceTracker
-              </span>
-            </Link>
-          </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-1">
-            {navLinks.map((link) => {
-              const Icon = link.icon;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    pathname === link.href
-                      ? 'bg-primary/10 text-primary border border-primary/20'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span>{link.label}</span>
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* User Profile / Mobile Menu */}
-          <div className="flex items-center space-x-3">
-            <div className="hidden md:block">
-              <ThemeToggle />
+              {/* Notifications */}
+              <div className="hidden md:block">
+                <NotificationBell 
+                  unreadCount={notificationCount} 
+                  onCountChange={setNotificationCount}
+                />
+              </div>
+              {/* Profile Menu */}
+              <div className="hidden md:block">
+                <ProfileMenu />
+              </div>
+              {/* Mobile Navigation */}
+              <MobileNavigation />
             </div>
-            <div className="hidden md:block">
-              <NotificationBell 
-                unreadCount={notificationCount} 
-                onCountChange={setNotificationCount}
-              />
-            </div>
-            <div className="hidden md:block">
-              <ProfileMenu />
-            </div>
-            <MobileNavigation />
           </div>
         </div>
-      </div>
-    </nav>
-    
-    {/* Mobile NotificationPanel */}
-    <NotificationPanel 
-      isOpen={showMobileNotifications} 
-      onClose={() => setShowMobileNotifications(false)}
-      onNotificationCountChange={setNotificationCount}
-    />
+      </nav>
+      
+      {/* Mobile NotificationPanel */}
+      <NotificationPanel 
+        isOpen={showMobileNotifications} 
+        onClose={() => setShowMobileNotifications(false)}
+        onNotificationCountChange={setNotificationCount}
+      />
+    </>
   );
 }

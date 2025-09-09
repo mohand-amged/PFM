@@ -12,7 +12,8 @@ export type NotificationType =
   | 'SUBSCRIPTION_RENEWAL' 
   | 'LOW_BALANCE' 
   | 'GOAL_ACHIEVED' 
-  | 'BUDGET_EXCEEDED';
+  | 'BUDGET_EXCEEDED'
+  | 'BUDGET_WARNING';
 
 export interface NotificationData {
   title: string;
@@ -179,47 +180,144 @@ export async function checkAndCreateSmartNotifications() {
   }
 
   try {
-    // Check for subscription renewals (within 3 days)
-    const threeDaysFromNow = new Date();
-    threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
-
-    const upcomingSubscriptions = await db.subscription.findMany({
-      where: {
-        userId: user.id,
-        billingDate: {
-          lte: threeDaysFromNow,
-          gte: new Date(),
-        },
-      },
+    // Get user preferences
+    const preferences = await db.userPreferences.findUnique({
+      where: { userId: user.id }
     });
 
-    for (const subscription of upcomingSubscriptions) {
-      const daysUntil = Math.ceil((subscription.billingDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-      
-      // Check if notification already exists for this subscription
-      const existingNotification = await db.notification.findFirst({
+    // Create default preferences if none exist
+    const userPrefs = preferences || {
+      reminderSevenDays: true,
+      reminderOneDay: true,
+      reminderSameDay: false,
+    };
+
+    // Check for subscription renewals based on user preferences
+    const today = new Date();
+    const sevenDaysFromNow = new Date();
+    sevenDaysFromNow.setDate(today.getDate() + 7);
+    const oneDayFromNow = new Date();
+    oneDayFromNow.setDate(today.getDate() + 1);
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+
+    // Check for 7-day reminders
+    if (userPrefs.reminderSevenDays) {
+      const sevenDaySubscriptions = await db.subscription.findMany({
         where: {
           userId: user.id,
-          type: 'SUBSCRIPTION_RENEWAL',
-          data: {
-            path: ['subscriptionId'],
-            equals: subscription.id,
-          },
-          createdAt: {
-            gte: new Date(new Date().setHours(0, 0, 0, 0)), // Today
+          billingDate: {
+            gte: sevenDaysFromNow,
+            lte: new Date(sevenDaysFromNow.getTime() + 24 * 60 * 60 * 1000), // Same day as 7 days from now
           },
         },
       });
 
-      if (!existingNotification) {
-        await createNotification(user.id, {
-          title: 'Subscription Renewal Reminder',
-          message: `${subscription.name} will renew in ${daysUntil} day${daysUntil !== 1 ? 's' : ''} for $${subscription.price}`,
-          type: 'SUBSCRIPTION_RENEWAL',
-          data: { subscriptionId: subscription.id, amount: subscription.price },
+      for (const subscription of sevenDaySubscriptions) {
+        // Check if notification already exists
+        const existingNotification = await db.notification.findFirst({
+          where: {
+            userId: user.id,
+            type: 'SUBSCRIPTION_RENEWAL',
+            data: {
+              path: ['subscriptionId'],
+              equals: subscription.id,
+            },
+            createdAt: {
+              gte: new Date(new Date().setHours(0, 0, 0, 0)), // Today
+            },
+          },
         });
+
+        if (!existingNotification) {
+          await createNotification(user.id, {
+            title: 'Subscription Renewal Reminder',
+            message: `${subscription.name} will renew in 7 days for $${subscription.price}`,
+            type: 'SUBSCRIPTION_RENEWAL',
+            data: { subscriptionId: subscription.id, amount: subscription.price, daysUntil: 7 },
+          });
+        }
       }
     }
+
+    // Check for 1-day reminders
+    if (userPrefs.reminderOneDay) {
+      const oneDaySubscriptions = await db.subscription.findMany({
+        where: {
+          userId: user.id,
+          billingDate: {
+            gte: oneDayFromNow,
+            lte: new Date(oneDayFromNow.getTime() + 24 * 60 * 60 * 1000), // Same day as tomorrow
+          },
+        },
+      });
+
+      for (const subscription of oneDaySubscriptions) {
+        // Check if notification already exists
+        const existingNotification = await db.notification.findFirst({
+          where: {
+            userId: user.id,
+            type: 'SUBSCRIPTION_RENEWAL',
+            data: {
+              path: ['subscriptionId'],
+              equals: subscription.id,
+            },
+            createdAt: {
+              gte: new Date(new Date().setHours(0, 0, 0, 0)), // Today
+            },
+          },
+        });
+
+        if (!existingNotification) {
+          await createNotification(user.id, {
+            title: 'Subscription Renewal Tomorrow',
+            message: `${subscription.name} will renew tomorrow for $${subscription.price}`,
+            type: 'SUBSCRIPTION_RENEWAL',
+            data: { subscriptionId: subscription.id, amount: subscription.price, daysUntil: 1 },
+          });
+        }
+      }
+    }
+
+    // Check for same-day reminders
+    if (userPrefs.reminderSameDay) {
+      const sameDaySubscriptions = await db.subscription.findMany({
+        where: {
+          userId: user.id,
+          billingDate: {
+            gte: new Date(today.setHours(0, 0, 0, 0)),
+            lte: new Date(today.setHours(23, 59, 59, 999)),
+          },
+        },
+      });
+
+      for (const subscription of sameDaySubscriptions) {
+        // Check if notification already exists
+        const existingNotification = await db.notification.findFirst({
+          where: {
+            userId: user.id,
+            type: 'SUBSCRIPTION_RENEWAL',
+            data: {
+              path: ['subscriptionId'],
+              equals: subscription.id,
+            },
+            createdAt: {
+              gte: new Date(new Date().setHours(0, 0, 0, 0)), // Today
+            },
+          },
+        });
+
+        if (!existingNotification) {
+          await createNotification(user.id, {
+            title: 'Subscription Renewal Today',
+            message: `${subscription.name} renews today for $${subscription.price}`,
+            type: 'SUBSCRIPTION_RENEWAL',
+            data: { subscriptionId: subscription.id, amount: subscription.price, daysUntil: 0 },
+          });
+        }
+      }
+    }
+
 
     // Check for low wallet balance
     const wallet = await db.wallet.findUnique({
@@ -308,6 +406,14 @@ export async function checkAndCreateSmartNotifications() {
           });
         }
       }
+    }
+
+    // Check for category budget alerts using the new budget system
+    try {
+      const { checkBudgetAlerts } = await import('@/app/actions/budgets');
+      await checkBudgetAlerts(today.getMonth() + 1, today.getFullYear());
+    } catch (error) {
+      console.error('Error checking category budget alerts:', error);
     }
 
   } catch (error) {

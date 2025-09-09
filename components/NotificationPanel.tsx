@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Bell, X, Check, CheckCheck, Trash2, Clock, AlertTriangle, Info, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -85,14 +85,7 @@ export default function NotificationPanel({ isOpen, onClose, onNotificationCount
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Fetch notifications when panel opens
-  useEffect(() => {
-    if (isOpen) {
-      fetchNotifications();
-    }
-  }, [isOpen]);
-
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch('/api/notifications');
@@ -109,7 +102,14 @@ export default function NotificationPanel({ isOpen, onClose, onNotificationCount
     } finally {
       setLoading(false);
     }
-  };
+  }, [onNotificationCountChange]);
+
+  // Fetch notifications when panel opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchNotifications();
+    }
+  }, [isOpen, fetchNotifications]);
 
   const handleMarkAsRead = async (notificationId: string) => {
     try {
@@ -204,7 +204,7 @@ export default function NotificationPanel({ isOpen, onClose, onNotificationCount
           <div className="text-center py-8">
             <Bell className="w-12 h-12 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 font-medium">No notifications</p>
-            <p className="text-gray-400 text-sm">You're all caught up!</p>
+            <p className="text-gray-400 text-sm">You&apos;re all caught up!</p>
           </div>
         ) : (
           <div className="space-y-3">

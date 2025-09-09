@@ -33,6 +33,7 @@ export default async function RootLayout({
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
+          storageKey="finance-tracker-theme"
         >
           <FinanceProvider>
             <Navbar user={user} />

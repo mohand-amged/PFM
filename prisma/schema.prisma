@@ -11,20 +11,39 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(auto()) @map("_id") @db.ObjectId
-  email         String         @unique
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  email         String          @unique
   password      String
   name          String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
   subscriptions Subscription[]
   expenses      Expense[]
   savings       Saving[]
   wallet        Wallet?
   notifications Notification[]
   incomes       Income[]
+  preferences   UserPreferences?
+  budgets       Budget[]
 
   @@map("users")
+}
+
+model UserPreferences {
+  id                    String  @id @default(auto()) @map("_id") @db.ObjectId
+  emailNotifications    Boolean @default(false)
+  pushNotifications     Boolean @default(false)
+  reminderSevenDays     Boolean @default(true)
+  reminderOneDay        Boolean @default(true)
+  reminderSameDay       Boolean @default(false)
+  weeklyDigest          Boolean @default(false)
+  monthlyReport         Boolean @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  userId               String   @unique @db.ObjectId
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
 }
 
 model Subscription {
@@ -130,6 +149,25 @@ enum IncomeType {
   OTHER
 }
 
+model Budget {
+  id                    String              @id @default(auto()) @map("_id") @db.ObjectId
+  category              String
+  monthlyLimit          Float
+  currency              String              @default("USD")
+  alertThreshold        Float               @default(80) // Alert when 80% of budget is reached
+  enableAlerts          Boolean             @default(true)
+  isActive              Boolean             @default(true)
+  month                 Int                 // 1-12 for month
+  year                  Int
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  userId                String              @db.ObjectId
+  user                  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, category, month, year])
+  @@map("budgets")
+}
+
 enum NotificationType {
   INFO
   WARNING
@@ -138,4 +176,5 @@ enum NotificationType {
   LOW_BALANCE
   GOAL_ACHIEVED
   BUDGET_EXCEEDED
+  BUDGET_WARNING
 }

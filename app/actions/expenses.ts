@@ -48,6 +48,14 @@ export async function createExpense(formData: FormData) {
     revalidatePath('/dashboard');
     revalidatePath('/analytics');
     
+    // Check budget alerts after adding expense
+    try {
+      const { checkBudgetAlerts } = await import('@/app/actions/budgets');
+      await checkBudgetAlerts(date.getMonth() + 1, date.getFullYear());
+    } catch (alertError) {
+      console.error('Error checking budget alerts:', alertError);
+    }
+    
   } catch (error) {
     console.error('Error creating expense:', error);
     throw error;
@@ -74,6 +82,14 @@ export async function createExpenseData(data: ExpenseData) {
     revalidatePath('/expenses');
     revalidatePath('/dashboard');
     revalidatePath('/analytics');
+    
+    // Check budget alerts after adding expense
+    try {
+      const { checkBudgetAlerts } = await import('@/app/actions/budgets');
+      await checkBudgetAlerts(data.date.getMonth() + 1, data.date.getFullYear());
+    } catch (alertError) {
+      console.error('Error checking budget alerts:', alertError);
+    }
     
     return { success: true, expense };
   } catch (error) {
