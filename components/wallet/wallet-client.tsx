@@ -138,7 +138,7 @@ export default function WalletClient({ stats, incomes, wallet }: WalletClientPro
               }}
               size="touch"
               variant="outline"
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto border-red-300 text-red-700 hover:bg-red-50 hover:border-red-400 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20"
             />
           </div>
         </div>

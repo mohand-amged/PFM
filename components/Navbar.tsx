@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { User, Settings, LogOut, Menu, X, Wallet, Bell, TrendingUp, CreditCard, PiggyBank, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import NotificationBell from '@/components/NotificationBell';
 import {
   Sheet,
   SheetContent,
@@ -25,6 +26,7 @@ interface NavbarProps {
 export default function Navbar({ user }: NavbarProps) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -38,6 +40,30 @@ export default function Navbar({ user }: NavbarProps) {
 
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
+
+  // Fetch notification count
+  useEffect(() => {
+    if (!user) return;
+    
+    const fetchNotificationCount = async () => {
+      try {
+        const response = await fetch('/api/notifications/count');
+        if (response.ok) {
+          const data = await response.json();
+          setNotificationCount(data.unread || 0);
+        }
+      } catch (error) {
+        console.error('Error fetching notification count:', error);
+      }
+    };
+    
+    fetchNotificationCount();
+    
+    // Fetch notification count every 30 seconds
+    const interval = setInterval(fetchNotificationCount, 30000);
+    
+    return () => clearInterval(interval);
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -128,9 +154,9 @@ export default function Navbar({ user }: NavbarProps) {
         </Button>
       </SheetTrigger>
       <SheetContent side="right" className="w-[320px] px-0">
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full max-h-screen">
           {/* Header */}
-          <div className="px-6 py-4 border-b border-border">
+          <div className="flex-shrink-0 px-6 py-4 border-b border-border">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
                 <User className="w-5 h-5 text-primary-foreground" />
@@ -144,8 +170,8 @@ export default function Navbar({ user }: NavbarProps) {
             </div>
           </div>
 
-          {/* Navigation Links */}
-          <div className="flex-1 px-4 py-6">
+          {/* Navigation Links - Scrollable */}
+          <div className="flex-1 overflow-y-auto px-4 py-6 pb-4">
             <div className="space-y-2">
               {navLinks.map((link) => {
                 const Icon = link.icon;
@@ -168,6 +194,27 @@ export default function Navbar({ user }: NavbarProps) {
             
             <hr className="my-6" />
             
+            {/* Notifications */}
+            <div className="px-4 py-3">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium text-foreground">Notifications</span>
+              </div>
+              <Link
+                href="/notifications"
+                className="flex items-center text-muted-foreground hover:bg-muted/50 hover:text-foreground px-4 py-3 rounded-xl transition-all duration-200 relative"
+              >
+                <Bell className="w-5 h-5 mr-4" />
+                <span className="font-medium">Notifications</span>
+                {notificationCount > 0 && (
+                  <span className="absolute -top-1 left-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                    {notificationCount > 9 ? '9+' : notificationCount}
+                  </span>
+                )}
+              </Link>
+            </div>
+            
+            <hr className="my-6" />
+            
             {/* Theme Toggle */}
             <div className="px-4 py-3">
               <div className="flex items-center justify-between mb-3">
@@ -178,7 +225,7 @@ export default function Navbar({ user }: NavbarProps) {
           </div>
           
           {/* Footer Actions */}
-          <div className="px-4 py-4 border-t border-border">
+          <div className="flex-shrink-0 px-4 py-4 border-t border-border bg-background">
             <div className="space-y-2">
               <Link
                 href="/profile"
@@ -253,6 +300,9 @@ export default function Navbar({ user }: NavbarProps) {
           <div className="flex items-center space-x-3">
             <div className="hidden md:block">
               <ThemeToggle />
+            </div>
+            <div className="hidden md:block">
+              <NotificationBell unreadCount={notificationCount} />
             </div>
             <div className="hidden md:block">
               <ProfileMenu />
