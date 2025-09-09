@@ -16,10 +16,9 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { clearAllUserData, exportUserData, deleteUserAccount } from '@/app/actions/settings';
+import { clearAllUserData, deleteUserAccount } from '@/app/actions/settings';
 import { 
   Trash2, 
-  Download, 
   AlertTriangle, 
   RefreshCw,
   Shield,
@@ -32,38 +31,11 @@ interface DangerZoneProps {
 }
 
 export default function DangerZone({ userEmail }: DangerZoneProps) {
-  const [isExporting, setIsExporting] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
-  const handleExportData = async () => {
-    setIsExporting(true);
-    setMessage(null);
-    
-    try {
-      const data = await exportUserData();
-      
-      // Create and download JSON file
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `subscription-tracker-data-${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      setMessage({ type: 'success', text: 'Data exported successfully!' });
-    } catch (error) {
-      console.error('Error exporting data:', error);
-      setMessage({ type: 'error', text: 'Failed to export data. Please try again.' });
-    } finally {
-      setIsExporting(false);
-    }
-  };
 
   const handleClearAllData = async () => {
     setIsClearing(true);
@@ -147,37 +119,6 @@ export default function DangerZone({ userEmail }: DangerZoneProps) {
       )}
       
       <div className="space-y-4">
-        {/* Export Data */}
-        <div className="border-2 border-blue-200 dark:border-blue-800/70 rounded-xl p-5 bg-gradient-to-r from-blue-50/80 to-blue-100/50 dark:from-blue-950/30 dark:to-blue-900/20 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <h4 className="font-semibold text-blue-900 dark:text-blue-100 flex items-center text-base">
-                <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center mr-3">
-                  <Download className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                </div>
-                Export Your Data
-              </h4>
-              <p className="text-sm text-blue-700/80 dark:text-blue-200/80 mt-2 leading-relaxed">
-                Download all your subscription, financial, and personal data as a JSON file.
-                This includes your wallet, expenses, income, savings, and subscriptions.
-              </p>
-            </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleExportData}
-              disabled={isExporting}
-              className="sm:flex-shrink-0 w-full sm:w-auto border-blue-300 text-blue-700 hover:bg-blue-100 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/30 font-medium shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50"
-            >
-              {isExporting ? (
-                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <Download className="w-4 h-4 mr-2" />
-              )}
-              {isExporting ? 'Exporting...' : 'Export Data'}
-            </Button>
-          </div>
-        </div>
 
         {/* Clear All Data */}
         <div className="border-2 border-orange-200 dark:border-orange-800/70 rounded-xl p-5 bg-gradient-to-r from-orange-50/80 to-orange-100/50 dark:from-orange-950/30 dark:to-orange-900/20 shadow-sm">

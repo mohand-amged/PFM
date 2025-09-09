@@ -34,9 +34,17 @@ import ImportData from '@/components/data/ImportData';
 export const dynamic = 'force-dynamic';
 
 export default async function SettingsPage() {
-  const authUser = await getCurrentUser();
+  let authUser;
+  
+  try {
+    authUser = await getCurrentUser();
+  } catch (error) {
+    console.error('Error getting current user in settings:', error);
+    redirect('/login');
+  }
   
   if (!authUser) {
+    console.log('No authenticated user found, redirecting to login');
     redirect('/login');
   }
 
@@ -106,30 +114,6 @@ export default async function SettingsPage() {
                 <h3 className="font-medium text-foreground mb-2">Theme</h3>
                 <p className="text-sm text-muted-foreground mb-4">Choose your preferred color scheme for the application.</p>
                 <ThemeRadioGroup />
-              </div>
-            </div>
-          </Card>
-
-          {/* Account Settings */}
-          <Card className="p-6">
-            <div className="flex items-center space-x-2 mb-4">
-              <User className="w-5 h-5 text-primary" />
-              <h2 className="text-xl font-semibold text-foreground">Account</h2>
-            </div>
-            <div className="space-y-6">
-              <div>
-                <h3 className="font-medium text-foreground mb-2">Profile Information</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Name:</span>
-                    <span className="text-foreground">{user.name || 'Not specified'}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Email:</span>
-                    <span className="text-foreground">{user.email}</span>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground mt-2">Profile editing functionality will be available soon.</p>
               </div>
             </div>
           </Card>
@@ -203,7 +187,7 @@ export default async function SettingsPage() {
               <Shield className="w-5 h-5 text-primary" />
               <h2 className="text-xl font-semibold text-foreground">Privacy & Security</h2>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div>
                 <h3 className="font-medium text-foreground">Data Privacy</h3>
                 <p className="text-sm text-muted-foreground mb-2">Control how your data is used and stored</p>
@@ -233,6 +217,11 @@ export default async function SettingsPage() {
                   🔒 Your privacy is protected. Analytics and tracking are currently disabled by default.
                 </p>
               </div>
+              
+              {/* Danger Zone - Only show on large screens within Privacy & Security */}
+              <div className="hidden lg:block" id="danger-zone">
+                <DangerZone userEmail={user.email} />
+              </div>
             </div>
           </Card>
         </div>
@@ -243,12 +232,6 @@ export default async function SettingsPage() {
           <Card className="p-6">
             <h3 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h3>
             <div className="space-y-3">
-              <Button variant="outline" className="w-full justify-start hover:bg-blue-50 dark:hover:bg-blue-900/20" asChild>
-                <a href="#danger-zone">
-                  <Download className="w-4 h-4 mr-2 text-blue-600" />
-                  Export Data
-                </a>
-              </Button>
               <Button variant="outline" className="w-full justify-start hover:bg-purple-50 dark:hover:bg-purple-900/20" asChild>
                 <Link href="/profile">
                   <User className="w-4 h-4 mr-2 text-purple-600" />
@@ -318,8 +301,8 @@ export default async function SettingsPage() {
             </div>
           </Card>
 
-          {/* Danger Zone */}
-          <div id="danger-zone">
+          {/* Danger Zone - Only show on small screens */}
+          <div className="lg:hidden" id="danger-zone-mobile">
             <DangerZone userEmail={user.email} />
           </div>
         </div>

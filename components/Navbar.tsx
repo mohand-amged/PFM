@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { User, Settings, LogOut, Menu, X, Home, CreditCard, Target, Settings as SettingsIcon, Bell, Palette, TrendingUp } from 'lucide-react';
+import { User, Settings, LogOut, Menu, X, Home, CreditCard, Target, Bell, Palette, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import NotificationBell from '@/components/NotificationBell';
 import NotificationPanel from '@/components/NotificationPanel';
@@ -84,7 +84,6 @@ export default function Navbar({ user }: NavbarProps) {
     { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/transactions', label: 'Transactions', icon: CreditCard },
     { href: '/budgets', label: 'Budgets', icon: Target },
-    { href: '/settings', label: 'Settings', icon: SettingsIcon },
   ];
 
   const ProfileMenu = () => (
