@@ -3,11 +3,13 @@ import { getUserSubscriptions, calculateSubscriptionStats } from '@/lib/subscrip
 import { getUserExpenses, calculateExpenseStats } from '@/lib/expenses';
 import { getUserSavings, calculateSavingStats } from '@/lib/savings';
 import { redirect } from 'next/navigation';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
-import ProfileActions from '@/components/ProfileActions';
-import { User, Mail, Calendar, Shield, Settings, TrendingUp, Target, CreditCard, PiggyBank, Receipt, BarChart3 } from 'lucide-react';
+import { User, Mail, Calendar, Shield, Settings, TrendingUp, Target, CreditCard, PiggyBank, Receipt, BarChart3, ArrowUpRight, Activity, Wallet, ChevronRight, Star } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -67,204 +69,261 @@ export default async function ProfilePage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground">Profile</h1>
-        <p className="text-muted-foreground mt-2">Manage your account and view your financial summary</p>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      {/* Header Section with Profile */}
+      <div className="relative px-4 pt-6 pb-8">
+        <div className="max-w-2xl mx-auto">
+          {/* Profile Header */}
+          <div className="text-center mb-6">
+            <div className="relative inline-block">
+              <div className="w-24 h-24 bg-gradient-to-br from-primary to-primary/80 rounded-3xl flex items-center justify-center shadow-lg">
+                <span className="text-3xl font-bold text-primary-foreground">
+                  {getInitials(user.name, user.email)}
+                </span>
+              </div>
+              <Badge className="absolute -top-1 -right-1 bg-green-500 text-white border-2 border-background">
+                <div className="w-2 h-2 bg-white rounded-full mr-1 animate-pulse"></div>
+                Online
+              </Badge>
+            </div>
+            
+            <h1 className="text-2xl font-bold mt-4 mb-1">{user.name || 'Welcome!'}</h1>
+            <p className="text-muted-foreground text-sm">{user.email}</p>
+            
+            <div className="flex items-center justify-center gap-4 mt-3 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <Calendar className="w-3 h-3" />
+                <span>Member for {daysSinceJoined} days</span>
+              </div>
+              <div className="w-1 h-1 bg-muted-foreground rounded-full"></div>
+              <div className="flex items-center gap-1">
+                <Shield className="w-3 h-3" />
+                <span>ID: {user.id.slice(-6)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Actions Bar */}
+          <div className="flex gap-3 justify-center mb-8">
+            <Button size="sm" asChild className="rounded-2xl">
+              <Link href="/settings">
+                <Settings className="w-4 h-4 mr-2" />
+                Settings
+              </Link>
+            </Button>
+            <Button size="sm" variant="outline" asChild className="rounded-2xl">
+              <Link href="/analytics">
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Analytics
+              </Link>
+            </Button>
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Profile Information */}
-        <div className="lg:col-span-2 space-y-6">
-          <Card className="p-6">
-            <div className="flex items-start justify-between mb-6">
-              <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
-                  <span className="text-2xl font-bold text-primary-foreground">
-                    {getInitials(user.name, user.email)}
-                  </span>
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-foreground">{user.name || 'Welcome!'}</h2>
-                  <p className="text-muted-foreground">{user.email}</p>
-                  <div className="flex items-center text-sm text-muted-foreground mt-1">
-                    <Calendar className="w-4 h-4 mr-1" />
-                    <span>Member for {daysSinceJoined} days</span>
-                  </div>
-                </div>
-              </div>
-              <Button asChild>
-                <Link href="/settings">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Settings
-                </Link>
-              </Button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-3">
-                <div className="flex items-center text-sm">
-                  <User className="w-4 h-4 mr-2 text-muted-foreground" />
-                  <span className="font-medium">Name:</span>
-                  <span className="ml-2 text-muted-foreground">{user.name || 'Not specified'}</span>
-                </div>
-                <div className="flex items-center text-sm">
-                  <Mail className="w-4 h-4 mr-2 text-muted-foreground" />
-                  <span className="font-medium">Email:</span>
-                  <span className="ml-2 text-muted-foreground">{user.email}</span>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-center text-sm">
-                  <Shield className="w-4 h-4 mr-2 text-muted-foreground" />
-                  <span className="font-medium">Account ID:</span>
-                  <span className="ml-2 text-muted-foreground font-mono text-xs">{user.id.slice(-8)}</span>
-                </div>
-                <div className="flex items-center text-sm">
-                  <Calendar className="w-4 h-4 mr-2 text-muted-foreground" />
-                  <span className="font-medium">Joined:</span>
-                  <span className="ml-2 text-muted-foreground">{joinDate.toLocaleDateString()}</span>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          {/* Financial Overview */}
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-foreground">Financial Overview</h3>
-              <Button variant="outline" asChild>
-                <Link href="/analytics">
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  View Analytics
-                </Link>
-              </Button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
-                  <div className="flex items-center">
-                    <CreditCard className="w-5 h-5 text-blue-600 mr-2" />
-                    <span className="font-medium">Subscriptions</span>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-blue-600">
-                      {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(subscriptionStats.totalMonthly)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{subscriptions.length} active</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-950 rounded-lg">
-                  <div className="flex items-center">
-                    <Receipt className="w-5 h-5 text-red-600 mr-2" />
-                    <span className="font-medium">Monthly Expenses</span>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-red-600">
-                      {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(expenseStats.totalMonthly)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{expenses.length} transactions</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-950 rounded-lg">
-                  <div className="flex items-center">
-                    <PiggyBank className="w-5 h-5 text-green-600 mr-2" />
-                    <span className="font-medium">Total Savings</span>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-green-600">
-                      {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(savingStats.totalSaved)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{savingStats.totalGoals} goals</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-950 rounded-lg">
-                  <div className="flex items-center">
-                    <TrendingUp className="w-5 h-5 text-purple-600 mr-2" />
-                    <span className="font-medium">Net Position</span>
-                  </div>
-                  <div className="text-right">
-                    <p className={`font-bold ${
+      <div className="px-4 pb-8">
+        <div className="max-w-2xl mx-auto space-y-6">
+          {/* Financial Summary Cards */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Net Position - Prominent */}
+            <Card className="col-span-2 bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Net Position</p>
+                    <p className={`text-3xl font-bold ${
                       netWorth >= 0 ? 'text-green-600' : 'text-red-600'
                     }`}>
                       {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(netWorth)}
                     </p>
-                    <p className="text-xs text-muted-foreground">Savings vs outflow</p>
+                    <p className="text-xs text-muted-foreground mt-1">Savings minus monthly outflow</p>
+                  </div>
+                  <div className="p-3 bg-primary/10 rounded-2xl">
+                    <TrendingUp className={`w-8 h-8 ${
+                      netWorth >= 0 ? 'text-green-600' : 'text-red-600'
+                    }`} />
                   </div>
                 </div>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="space-y-6">
-          <Card className="p-6">
-            <h3 className="text-lg font-bold text-foreground mb-4">Quick Stats</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Total Monthly Outflow</span>
-                <span className="font-semibold">
-                  {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(totalMonthlyOutflow)}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Completed Goals</span>
-                <span className="font-semibold">{savingStats.completedGoals}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Active Goals</span>
-                <span className="font-semibold">{savingStats.activeSavings.length}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Upcoming Renewals</span>
-                <span className="font-semibold">{subscriptionStats.upcomingRenewals.length}</span>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="text-lg font-bold text-foreground mb-4">Quick Actions</h3>
-            <ProfileActions />
-          </Card>
-
-          {savingStats.activeSavings.length > 0 && (
-            <Card className="p-6">
-              <h3 className="text-lg font-bold text-foreground mb-4">Active Goals</h3>
-              <div className="space-y-3">
-                {savingStats.activeSavings.slice(0, 3).map((saving: any) => {
-                  const progress = saving.targetAmount ? (saving.amount / saving.targetAmount) * 100 : 0;
-                  return (
-                    <div key={saving.id} className="space-y-1">
-                      <div className="flex justify-between text-sm">
-                        <span className="font-medium">{saving.name}</span>
-                        <span className="text-muted-foreground">{Math.round(progress)}%</span>
-                      </div>
-                      <div className="w-full bg-muted rounded-full h-2">
-                        <div 
-                          className="bg-primary h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${Math.min(progress, 100)}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              {savingStats.activeSavings.length > 3 && (
-                <Button variant="outline" size="sm" className="w-full mt-3" asChild>
-                  <Link href="/savings">
-                    View All Goals
-                  </Link>
-                </Button>
-              )}
+              </CardContent>
             </Card>
-          )}
+
+            {/* Subscriptions */}
+            <Card className="bg-blue-50/50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-xl">
+                    <CreditCard className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-muted-foreground">Subscriptions</p>
+                    <p className="font-bold text-blue-600 truncate">
+                      {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(subscriptionStats.totalMonthly)}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">{subscriptions.length} active</span>
+                  <Badge variant="secondary" className="text-xs">
+                    /month
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Expenses */}
+            <Card className="bg-red-50/50 dark:bg-red-950/50 border-red-200 dark:border-red-800">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-2 bg-red-100 dark:bg-red-900 rounded-xl">
+                    <Receipt className="w-4 h-4 text-red-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-muted-foreground">Expenses</p>
+                    <p className="font-bold text-red-600 truncate">
+                      {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(expenseStats.totalMonthly)}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">{expenses.length} items</span>
+                  <Badge variant="secondary" className="text-xs">
+                    /month
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Savings Overview */}
+          <Card className="bg-green-50/50 dark:bg-green-950/50 border-green-200 dark:border-green-800">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <PiggyBank className="w-5 h-5 text-green-600" />
+                  Savings Overview
+                </CardTitle>
+                <Badge variant="outline" className="text-green-600 border-green-600">
+                  {savingStats.totalGoals} goals
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-bold text-2xl text-green-600">
+                    {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(savingStats.totalSaved)}
+                  </p>
+                  <p className="text-sm text-muted-foreground">Total saved</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-semibold text-green-600">{savingStats.completedGoals}</p>
+                  <p className="text-xs text-muted-foreground">Completed</p>
+                </div>
+              </div>
+              
+              {savingStats.activeSavings.length > 0 && (
+                <>
+                  <Separator />
+                  <div className="space-y-3">
+                    <p className="text-sm font-medium">Active Goals</p>
+                    {savingStats.activeSavings.slice(0, 2).map((saving: any) => {
+                      const progress = saving.targetAmount ? (saving.amount / saving.targetAmount) * 100 : 0;
+                      return (
+                        <div key={saving.id} className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="font-medium truncate pr-2">{saving.name}</span>
+                            <span className="text-muted-foreground whitespace-nowrap">{Math.round(progress)}%</span>
+                          </div>
+                          <Progress value={Math.min(progress, 100)} className="h-2" />
+                        </div>
+                      );
+                    })}
+                    {savingStats.activeSavings.length > 2 && (
+                      <Button variant="ghost" size="sm" className="w-full text-green-600" asChild>
+                        <Link href="/transactions?tab=savings">
+                          View {savingStats.activeSavings.length - 2} more goals
+                          <ChevronRight className="w-4 h-4 ml-1" />
+                        </Link>
+                      </Button>
+                    )}
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Quick Stats */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Activity className="w-5 h-5" />
+                Quick Stats
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-3 bg-muted/50 rounded-xl">
+                  <p className="text-2xl font-bold">
+                    {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(totalMonthlyOutflow)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Monthly outflow</p>
+                </div>
+                <div className="text-center p-3 bg-muted/50 rounded-xl">
+                  <p className="text-2xl font-bold">{subscriptionStats.upcomingRenewals.length}</p>
+                  <p className="text-xs text-muted-foreground">Upcoming renewals</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Navigation Actions */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Quick Navigation</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-1 gap-3">
+                <Link href="/dashboard" className="block">
+                  <Button variant="outline" className="w-full justify-between h-12 rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <BarChart3 className="w-4 h-4 text-primary" />
+                      </div>
+                      <span className="font-medium">Dashboard</span>
+                    </div>
+                    <ArrowUpRight className="w-4 h-4" />
+                  </Button>
+                </Link>
+                
+                <Link href="/transactions" className="block">
+                  <Button variant="outline" className="w-full justify-between h-12 rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                        <Wallet className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <span className="font-medium">Transactions</span>
+                    </div>
+                    <ArrowUpRight className="w-4 h-4" />
+                  </Button>
+                </Link>
+                
+                <Link href="/budgets" className="block">
+                  <Button variant="outline" className="w-full justify-between h-12 rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
+                        <Target className="w-4 h-4 text-green-600" />
+                      </div>
+                      <span className="font-medium">Budgets</span>
+                    </div>
+                    <ArrowUpRight className="w-4 h-4" />
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Footer Space */}
+          <div className="h-6"></div>
         </div>
       </div>
     </div>
