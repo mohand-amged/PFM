@@ -6,6 +6,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { User, Settings, LogOut, Menu, X, Wallet, Bell, TrendingUp, CreditCard, PiggyBank, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import NotificationBell from '@/components/NotificationBell';
+import NotificationPanel from '@/components/NotificationPanel';
 import {
   Sheet,
   SheetContent,
@@ -27,6 +28,7 @@ export default function Navbar({ user }: NavbarProps) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
+  const [showMobileNotifications, setShowMobileNotifications] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -199,18 +201,21 @@ export default function Navbar({ user }: NavbarProps) {
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-medium text-foreground">Notifications</span>
               </div>
-              <Link
-                href="/notifications"
-                className="flex items-center text-muted-foreground hover:bg-muted/50 hover:text-foreground px-4 py-3 rounded-xl transition-all duration-200 relative"
-              >
-                <Bell className="w-5 h-5 mr-4" />
-                <span className="font-medium">Notifications</span>
-                {notificationCount > 0 && (
-                  <span className="absolute -top-1 left-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                    {notificationCount > 9 ? '9+' : notificationCount}
-                  </span>
-                )}
-              </Link>
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  className="flex items-center w-full text-muted-foreground hover:bg-muted/50 hover:text-foreground px-4 py-3 rounded-xl transition-all duration-200 justify-start"
+                  onClick={() => setShowMobileNotifications(true)}
+                >
+                  <Bell className="w-5 h-5 mr-4" />
+                  <span className="font-medium">Notifications</span>
+                  {notificationCount > 0 && (
+                    <span className="ml-auto h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                      {notificationCount > 9 ? '9+' : notificationCount}
+                    </span>
+                  )}
+                </Button>
+              </div>
             </div>
             
             <hr className="my-6" />
@@ -302,7 +307,10 @@ export default function Navbar({ user }: NavbarProps) {
               <ThemeToggle />
             </div>
             <div className="hidden md:block">
-              <NotificationBell unreadCount={notificationCount} />
+              <NotificationBell 
+                unreadCount={notificationCount} 
+                onCountChange={setNotificationCount}
+              />
             </div>
             <div className="hidden md:block">
               <ProfileMenu />
@@ -312,5 +320,12 @@ export default function Navbar({ user }: NavbarProps) {
         </div>
       </div>
     </nav>
+    
+    {/* Mobile NotificationPanel */}
+    <NotificationPanel 
+      isOpen={showMobileNotifications} 
+      onClose={() => setShowMobileNotifications(false)}
+      onNotificationCountChange={setNotificationCount}
+    />
   );
 }
