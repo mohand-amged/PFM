@@ -79,15 +79,15 @@ export default async function SettingsPage() {
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="general" className="flex items-center gap-2">
             <SettingsIcon size={16} />
-            General
+            Preferences
           </TabsTrigger>
           <TabsTrigger value="data" className="flex items-center gap-2">
             <Database size={16} />
-            Data Management
+            Data
           </TabsTrigger>
           <TabsTrigger value="profile" className="flex items-center gap-2">
             <User size={16} />
-            Profile & Security
+            Account
           </TabsTrigger>
         </TabsList>
 
@@ -338,16 +338,16 @@ export default async function SettingsPage() {
         <Card className="p-6">
           <div className="flex items-center space-x-2 mb-4">
             <User className="w-5 h-5 text-primary" />
-            <h2 className="text-xl font-semibold text-foreground">Profile & Security</h2>
+            <h2 className="text-xl font-semibold text-foreground">Account Management</h2>
           </div>
           <div className="text-center p-8">
             <User size={48} className="mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Profile Management Coming Soon</h3>
+            <h3 className="text-lg font-semibold mb-2">Account Settings Coming Soon</h3>
             <p className="text-muted-foreground">
-              Advanced profile editing and security settings will be available here.
+              Advanced account management and security settings will be available here.
             </p>
             <p className="text-sm text-muted-foreground mt-2">
-              For now, basic account information is shown in the General tab.
+              For now, basic account information is shown in the Preferences tab.
             </p>
           </div>
         </Card>

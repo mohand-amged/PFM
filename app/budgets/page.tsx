@@ -34,7 +34,7 @@ export default async function BudgetsPage() {
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="budgets" className="flex items-center gap-2">
               <Target size={16} />
-              Budget Management
+              Manage Budgets
             </TabsTrigger>
             <TabsTrigger value="analytics" className="flex items-center gap-2">
               <BarChart3 size={16} />
