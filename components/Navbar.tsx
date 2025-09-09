@@ -190,19 +190,6 @@ export default function Navbar({ user }: NavbarProps) {
                   </Link>
                 );
               })}
-              
-              {/* Account Link for Mobile */}
-              <Link
-                href="/account"
-                className={`flex items-center px-4 py-3 rounded-xl transition-all duration-200 ${
-                  pathname === '/account'
-                    ? 'bg-primary/10 text-primary border border-primary/20 shadow-sm'
-                    : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
-                }`}
-              >
-                <User className="w-5 h-5 mr-4" />
-                <span className="font-medium text-base">Account</span>
-              </Link>
             </div>
             
             <hr className="my-6" />

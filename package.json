@@ -6,11 +6,7 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "next lint",
-    "postinstall": "prisma generate",
-    "vercel-build": "prisma generate && next build",
-    "db-push": "prisma db push",
-    "db-reset": "prisma db push --force-reset"
+    "lint": "next lint"
   },
   "dependencies": {
     "@prisma/client": "^5.0.0",
@@ -62,9 +58,5 @@
     "eslint-config-next": "^15.5.2",
     "prisma": "^5.0.0",
     "typescript": "^5"
-  },
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0"
   }
 }
